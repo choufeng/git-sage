@@ -2,6 +2,8 @@
 
 Git Sage 是一个 AI 驱动的 Git 助手，它可以帮助你生成更好的提交信息。
 
+![Git Sage 概览](docs/image.png)
+
 ## 功能特点
 
 - 自动分析已暂存的更改

@@ -4,6 +4,8 @@
 
 Git Sage is an AI-powered Git assistant that helps you generate better commit messages.
 
+![Git Sage Overview](docs/image.png)
+
 ## Features
 
 - Automatically analyze staged changes
