@@ -71,12 +71,38 @@ class AIProcessor:
             
             prompt = f"""You are a commit message generator. Analyze the following git diff and generate a structured commit message in {language}. Focus only on describing the actual changes shown in the diff, not any potential follow-up actions.
 
+Language mapping:
+- en: Generate the commit message in English
+- zh: Generate the commit message in Chinese (简体中文)
+
 The diff content is:
 
 {diff_content}
 
+Commit Tags Explanation:
+
+Patch Version (PATCH) Tags:
+- fix: For bug fixes
+- build: For build process changes only
+- maint/maintenance: For small maintenance tasks like technical debt cleanup, refactoring, and non-breaking dependency updates
+- test: For application end-to-end tests
+- patch: Generic patch tag when other patch tags don't apply
+
+Minor Version (MINOR) Tags:
+- feat/feature/new: For implementing new features
+- minor: Generic minor tag when other minor tags don't apply
+- update: For backward-compatible enhancements to existing features
+
+Major Version (MAJOR) Tags:
+- breaking: For backward-incompatible enhancements or features
+- major: Generic major tag when other major tags don't apply
+
+No Version Update (NO-OP) Tags:
+- docs: For documentation changes only
+- chore: For other changes that don't affect the actual environment (code comments, non-package files, unit tests)
+
 You must respond in exactly this format:
-type: [choose one: feat/fix/docs/style/refactor/test/chore]
+type: [choose the most appropriate tag from the above list]
 subject: [brief description, max 50 chars]
 body: [detailed explanation of the changes shown in the diff]
 
@@ -87,11 +113,12 @@ body: Convert README to English and improve documentation structure. Add detaile
 
 Remember:
 1. Keep the format exactly as shown
-2. Use {language} for all text
-3. Choose type from the given options
+2. Use {language} for all text (en for English, zh for Chinese)
+3. Choose type from the given tag options based on the nature of changes
 4. Keep subject under 50 characters
 5. Only describe changes shown in the diff
 6. Do not include any installation steps or commands in the message
+7. Choose the most specific and appropriate tag for the changes
 
 Your response:"""
             
