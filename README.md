@@ -6,7 +6,7 @@ Git Sage 是一个AI驱动的Git助手，它可以帮助你生成更好的提交
 
 - 自动分析已暂存的更改
 - 使用AI生成规范的提交信息
-- 支持多语言提交信息（包括但不限于中文、英文、日文等）
+- 支持中英文提交信息
 - 支持自定义AI模型配置
 - 简单易用的命令行界面
 
@@ -45,7 +45,7 @@ gsg config -i
 # 查看当前配置
 gsg config
 
-# 设置语言
+# 设置语言（支持 en/zh）
 gsg config --language zh
 
 # 设置AI模型
@@ -63,8 +63,8 @@ gsg config --endpoint http://localhost:11434
 生成提交信息：
 
 ```bash
-# 首先使用git add暂存你想要提交的更改
-git add <file1> <file2>  # 例如: git add src/main.js test/main.test.js
+# 首先使用git add暂存你的更改
+git add .
 
 # 然后使用gsg生成提交信息并提交
 gsg a
