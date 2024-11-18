@@ -28,6 +28,52 @@ pip install -e .
 gsg set
 ```
 
+## Platforms
+
+Git Sage supports multiple AI platforms to power its commit message generation. Here's how to set up and use each platform:
+
+### Ollama (Local)
+- Download: Visit [Ollama's official website](https://ollama.ai) to download and install
+- Setup:
+  ```bash
+  # Pull the recommended model
+  ollama pull qwen2.5-coder:7b
+  
+  # Start the Ollama service
+  ollama serve
+  ```
+- Configuration:
+  ```bash
+  gsg set
+  # Set language_model to: ollama
+  # Set endpoint to: http://localhost:11434
+  # Set model to: qwen2.5-coder:7b
+  # API key can be left as default
+  ```
+
+### OpenRouter
+- Registration: Sign up at [OpenRouter](https://openrouter.ai)
+- API Key: Generate from your account dashboard
+- Configuration:
+  ```bash
+  gsg set
+  # Set language_model to: openrouter
+  # Set model to: anthropic/claude-3-sonnet
+  # Set your API key when prompted
+  ```
+
+### DeepSeek
+- Registration: Visit [DeepSeek](https://platform.deepseek.com)
+- API Key: Generate from your account settings
+- Configuration:
+  ```bash
+  gsg set
+  # Set language_model to: deepseek
+  # Set endpoint to: https://api.deepseek.com/v1
+  # Set model to: deepseek-chat
+  # Set your API key when prompted
+  ```
+
 ## Configuration
 
 Configure Git Sage settings:

@@ -26,6 +26,52 @@ pip install -e .
 gsg set
 ```
 
+## 平台
+
+Git Sage 支持多个AI平台来驱动其提交信息生成功能。以下是各平台的设置和使用方法：
+
+### Ollama（本地）
+- 下载：访问 [Ollama官网](https://ollama.ai) 下载并安装
+- 设置：
+  ```bash
+  # 拉取推荐模型
+  ollama pull qwen2.5-coder:7b
+  
+  # 启动Ollama服务
+  ollama serve
+  ```
+- 配置：
+  ```bash
+  gsg set
+  # 将language_model设置为：ollama
+  # 将endpoint设置为：http://localhost:11434
+  # 将model设置为：qwen2.5-coder:7b
+  # API密钥可保持默认
+  ```
+
+### OpenRouter
+- 注册：在 [OpenRouter](https://openrouter.ai) 注册账号
+- API密钥：从账户控制面板生成
+- 配置：
+  ```bash
+  gsg set
+  # 将language_model设置为：openrouter
+  # 将model设置为：anthropic/claude-3-sonnet
+  # 在提示时输入你的API密钥
+  ```
+
+### DeepSeek
+- 注册：访问 [DeepSeek](https://platform.deepseek.com)
+- API密钥：从账户设置生成
+- 配置：
+  ```bash
+  gsg set
+  # 将language_model设置为：deepseek
+  # 将endpoint设置为：https://api.deepseek.com/v1
+  # 将model设置为：deepseek-chat
+  # 在提示时输入你的API密钥
+  ```
+
 ## 配置
 
 配置Git Sage设置：
