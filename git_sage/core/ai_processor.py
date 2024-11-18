@@ -128,12 +128,12 @@ Commit Tags Explanation:
 Patch Version (PATCH) Tags:
 - fix: For bug fixes
 - build: For build process changes only
-- maint/maintenance: For small maintenance tasks like technical debt cleanup, refactoring, and non-breaking dependency updates
+- maint: For small maintenance tasks like technical debt cleanup, refactoring, and non-breaking dependency updates
 - test: For application end-to-end tests
 - patch: Generic patch tag when other patch tags don't apply
 
 Minor Version (MINOR) Tags:
-- feat/feature/new: For implementing new features
+- feat: For implementing new features
 - minor: Generic minor tag when other minor tags don't apply
 - update: For backward-compatible enhancements to existing features
 
