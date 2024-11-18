@@ -33,15 +33,18 @@ gsg set
 Git Sage supports multiple AI platforms to power its commit message generation. Here's how to set up and use each platform:
 
 ### Ollama (Local)
+
 - Download: Visit [Ollama's official website](https://ollama.ai) to download and install
 - Setup:
+
   ```bash
   # Pull the recommended model
   ollama pull qwen2.5-coder:7b
-  
+
   # Start the Ollama service
   ollama serve
   ```
+
 - Configuration:
   ```bash
   gsg set
@@ -52,6 +55,7 @@ Git Sage supports multiple AI platforms to power its commit message generation. 
   ```
 
 ### OpenRouter
+
 - Registration: Sign up at [OpenRouter](https://openrouter.ai)
 - API Key: Generate from your account dashboard
 - Configuration:
@@ -63,6 +67,7 @@ Git Sage supports multiple AI platforms to power its commit message generation. 
   ```
 
 ### DeepSeek
+
 - Registration: Visit [DeepSeek](https://platform.deepseek.com)
 - API Key: Generate from your account settings
 - Configuration:
@@ -77,6 +82,7 @@ Git Sage supports multiple AI platforms to power its commit message generation. 
 ## Configuration
 
 Configure Git Sage settings:
+
 ```bash
 # Set up configuration through interactive mode
 gsg set
@@ -86,6 +92,7 @@ gsg show config
 ```
 
 The configuration wizard will guide you through setting up:
+
 - Response language
 - Language model service
 - Model name
@@ -98,7 +105,7 @@ Generate commit message:
 
 ```bash
 # First stage your changes using git add
-git add .
+git add [files]
 
 # Then use gsg to generate commit message and commit
 gsg c
@@ -116,6 +123,7 @@ Optional detailed description
 ### Commit Tags Explanation
 
 #### Patch Version (PATCH)
+
 The following tags will trigger a patch version update:
 
 - `Fix`: For bug fixes
@@ -125,6 +133,7 @@ The following tags will trigger a patch version update:
 - `Patch`: Generic patch tag when other patch tags don't apply
 
 #### Minor Version (MINOR)
+
 The following tags will trigger a minor version update:
 
 - `Feat`/`Feature`/`New`: For implementing new features
@@ -132,12 +141,14 @@ The following tags will trigger a minor version update:
 - `Update`: For backward-compatible enhancements to existing features
 
 #### Major Version (MAJOR)
+
 The following tags will trigger a major version update:
 
 - `Breaking`: For backward-incompatible enhancements or features
 - `Major`: Generic major tag when other major tags don't apply
 
 #### No Version Update (NO-OP)
+
 The following tags will not trigger a version update:
 
 - `Docs`: For documentation changes only
@@ -162,6 +173,14 @@ You can view current configuration using `gsg show config` and modify settings t
 - gitpython >= 3.1.40
 - click >= 8.1.7
 - pyyaml >= 6.0.1
+- requests >= 2.31.0
+- langchain-community >= 0.0.10
+- langchain-ollama >= 0.2.0
+- langchain-core >= 0.3.0
+- langchain-openai >= 0.0.5
+- openai >= 1.0.0
+- ollama >= 0.3.0
+- inquirer >= 3.1.3
 
 ## License
 
