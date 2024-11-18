@@ -23,13 +23,15 @@ class AIProcessor:
             os.environ["OLLAMA_BASE_URL"] = endpoint
             return OllamaLLM(
                 model=model_name,
-                base_url=endpoint
+                base_url=endpoint,
+                temperature=0.5
             )
         elif language_model == "openrouter":
             return ChatOpenAI(
                 model=model_name,
                 openai_api_key=api_key,
                 base_url=endpoint,
+                temperature=0.5,
                 default_headers={
                     "HTTP-Referer": "git-sage-cli",
                     "X-Title": "Git-Sage"
@@ -39,7 +41,8 @@ class AIProcessor:
             return ChatOpenAI(
                 model=model_name,
                 openai_api_key=api_key,
-                base_url=endpoint
+                base_url=endpoint,
+                temperature=0.5
             )
         else:
             raise ValueError(f"Unsupported language model service: {language_model}")
