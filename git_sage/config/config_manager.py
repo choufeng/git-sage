@@ -4,7 +4,7 @@ from typing import Dict, Optional
 
 class ConfigManager:
     DEFAULT_CONFIG = {
-        "language": "English",  # 默认使用英文，但用户可以配置任何语言名称
+        "language": "English",  # Default to English, but users can configure any language name
         "language_model": "ollama",
         "model": "qwen2.5-coder:7b",
         "endpoint": "http://localhost:11434",
@@ -16,7 +16,7 @@ class ConfigManager:
         self.config = self.load_config()
     
     def load_config(self) -> Dict:
-        """加载配置文件，如果不存在则创建默认配置"""
+        """Load configuration file, create default config if it doesn't exist"""
         if not os.path.exists(self.config_path):
             os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
             self.save_config(self.DEFAULT_CONFIG)
@@ -31,32 +31,32 @@ class ConfigManager:
             return self.DEFAULT_CONFIG
     
     def save_config(self, config: Dict) -> None:
-        """保存配置到文件"""
+        """Save configuration to file"""
         os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
         with open(self.config_path, 'w', encoding='utf-8') as f:
             yaml.dump(config, f, allow_unicode=True)
     
     def get_language(self) -> str:
-        """获取当前配置的语言"""
+        """Get currently configured language"""
         return self.config.get("language", "English")
     
     def get_language_model(self) -> str:
-        """获取当前使用的语言模型服务类型"""
+        """Get current language model service type"""
         return self.config.get("language_model", "ollama")
     
     def get_model(self) -> str:
-        """获取当前选择的具体模型名称"""
+        """Get current specific model name"""
         return self.config.get("model", "qwen2.5-coder:7b")
     
     def get_model_endpoint(self) -> str:
-        """获取模型服务地址"""
+        """Get model service endpoint"""
         return self.config.get("endpoint", "http://localhost:11434")
     
     def get_api_key(self) -> str:
-        """获取API密钥"""
+        """Get API key"""
         return self.config.get("api_key", "ollama")
     
     def update_config(self, key: str, value: str) -> None:
-        """更新配置项"""
+        """Update configuration item"""
         self.config[key] = value
         self.save_config(self.config)

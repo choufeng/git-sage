@@ -8,43 +8,43 @@ class GitOperations:
         self.repo = self._get_repo()
     
     def _get_repo(self) -> Repo:
-        """获取当前目录的Git仓库"""
+        """Get Git repository for current directory"""
         try:
             return Repo(os.getcwd(), search_parent_directories=True)
         except Exception as e:
             raise Exception("Not a git repository") from e
     
     def get_staged_files(self) -> List[str]:
-        """获取已经git add的文件列表"""
+        """Get list of files that have been git added"""
         try:
             staged_files = []
             
-            # 获取已暂存的修改文件
+            # Get modified files in staging area
             if self.repo.head.is_valid():
                 diff_staged = self.repo.git.diff("--cached", "--name-only").split('\n')
                 staged_files.extend([f for f in diff_staged if f])
             else:
-                # 如果是初始提交，获取所有暂存的文件
+                # For initial commit, get all staged files
                 staged_files.extend([item.a_path for item in self.repo.index.diff(None)])
-                # 获取所有已添加到暂存区的新文件
+                # Get all new files added to staging area
                 for entry in self.repo.index.entries:
                     if isinstance(entry, tuple) and len(entry) > 0:
                         staged_files.append(entry[0])
                     elif isinstance(entry, str):
                         staged_files.append(entry)
                 
-            return list(set(staged_files))  # 去重
+            return list(set(staged_files))  # Remove duplicates
         except Exception as e:
             raise Exception(f"Failed to get staged files: {e}") from e
     
     def get_staged_diff(self) -> str:
-        """获取已暂存文件的更改内容"""
+        """Get changes in staged files"""
         try:
-            # 获取暂存区和HEAD之间的差异
+            # Get differences between staging area and HEAD
             if self.repo.head.is_valid():
                 diff = self.repo.git.diff("--cached")
             else:
-                # 如果是初始仓库，显示暂存区中的文件内容
+                # For initial repository, show content of files in staging area
                 diff = ""
                 for file_path in self.get_staged_files():
                     try:
@@ -64,27 +64,27 @@ class GitOperations:
     
     def commit(self, message: str, confirm: bool = True) -> bool:
         """
-        提交更改
-        :param message: 提交信息
-        :param confirm: 是否需要编辑确认
-        :return: 是否提交成功
+        Commit changes
+        :param message: Commit message
+        :param confirm: Whether to require edit confirmation
+        :return: Whether commit was successful
         """
         try:
             if confirm:
-                # 创建临时文件来编辑提交信息
+                # Create temporary file for editing commit message
                 with tempfile.NamedTemporaryFile(mode='w+', suffix='.tmp', delete=False) as temp_file:
                     temp_file.write(message)
-                    temp_file.write("\n\n# 请在上方编辑您的提交信息。")
-                    temp_file.write("\n# 保存并退出编辑器将执行提交操作。")
-                    temp_file.write("\n# 中断编辑将取消提交。")
+                    temp_file.write("\n\n# Please edit your commit message above.")
+                    temp_file.write("\n# Save and exit the editor to proceed with the commit.")
+                    temp_file.write("\n# Interrupting the edit will cancel the commit.")
                     temp_file_path = temp_file.name
 
                 try:
-                    # 使用系统默认编辑器打开临时文件
+                    # Open temporary file with system default editor
                     editor = os.environ.get('EDITOR', 'vim')
                     os.system(f'{editor} {temp_file_path}')
 
-                    # 读取编辑后的提交信息
+                    # Read edited commit message
                     with open(temp_file_path, 'r') as temp_file:
                         edited_message = ''
                         for line in temp_file:
@@ -92,30 +92,30 @@ class GitOperations:
                                 edited_message += line
                         edited_message = edited_message.strip()
 
-                    # 只在消息为空时取消提交
+                    # Cancel commit only if message is empty
                     if not edited_message:
-                        print("提交信息为空，提交已取消。")
+                        print("Commit message is empty, commit cancelled.")
                         return False
                     
-                    # 询问用户是否确认提交
-                    confirm_input = input("\n是否确认提交？[Y/n] ").strip().lower()
+                    # Ask user to confirm commit
+                    confirm_input = input("\nConfirm commit? [Y/n] ").strip().lower()
                     if confirm_input == '' or confirm_input == 'y':
-                        # 执行提交
+                        # Execute commit
                         self.repo.index.commit(edited_message)
-                        print("提交已完成。")
+                        print("Commit completed.")
                         return True
                     else:
-                        print("提交已取消。")
+                        print("Commit cancelled.")
                         return False
 
                 finally:
-                    # 清理临时文件
+                    # Clean up temporary file
                     try:
                         os.unlink(temp_file_path)
                     except:
                         pass
             else:
-                # 如果不需要确认，直接提交
+                # If no confirmation needed, commit directly
                 self.repo.index.commit(message)
                 return True
 
@@ -123,9 +123,9 @@ class GitOperations:
             raise Exception(f"Failed to commit: {e}") from e
     
     def has_staged_changes(self) -> bool:
-        """检查是否有已暂存的更改"""
+        """Check if there are staged changes"""
         try:
-            # 使用 get_staged_files 来检查是否有暂存的文件
+            # Use get_staged_files to check for staged files
             staged_files = self.get_staged_files()
             return len(staged_files) > 0
         except Exception as e:

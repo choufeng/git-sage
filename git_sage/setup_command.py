@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 def main():
-    """初始化配置命令"""
+    """Initialize configuration command"""
     print("\n=== Git Sage 初始配置 ===")
     if click.confirm("是否现在进行配置？", default=True):
         try:

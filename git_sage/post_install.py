@@ -3,9 +3,9 @@ import subprocess
 import sys
 
 def run_config():
-    """运行配置命令"""
+    """Run configuration command"""
     try:
-        # 使用gsg而不是git_sage.cli.main
+        # Use gsg instead of git_sage.cli.main
         subprocess.run(["gsg", "config", "-i"], check=True)
     except subprocess.CalledProcessError:
         click.echo("配置过程中出现错误。你可以稍后使用 'gsg config -i' 命令重新配置。")
@@ -15,7 +15,7 @@ def run_config():
 
 @click.command()
 def main():
-    """初始化配置命令"""
+    """Initialize configuration command"""
     click.echo("\n=== Git Sage 初始配置 ===")
     if click.confirm("是否现在进行配置？", default=True):
         run_config()

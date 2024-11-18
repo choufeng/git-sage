@@ -13,27 +13,27 @@ def cli():
 def c(files):
     """Analyze staged changes and generate commit message"""
     try:
-        # 初始化各个模块
+        # Initialize modules
         config_manager = ConfigManager()
         git_ops = GitOperations()
         ai_processor = AIProcessor(config_manager)
         
-        # 检查是否有暂存的更改
+        # Check for staged changes
         if not git_ops.has_staged_changes():
             click.echo("No staged changes found. Please 'git add' some files first.")
             return
         
-        # 获取diff内容
+        # Get diff content
         diff_content = git_ops.get_staged_diff()
         if not diff_content:
             click.echo("No changes to analyze.")
             return
         
-        # 使用AI处理diff内容
+        # Process diff content with AI
         click.echo("Analyzing changes...")
         commit_message = ai_processor.process_diff(diff_content)
         
-        # 执行提交
+        # Execute commit
         if git_ops.commit(commit_message):
             click.echo("Changes committed successfully!")
         
@@ -56,7 +56,7 @@ def config(interactive, language, language_model, model, endpoint, api_key):
         if interactive:
             click.echo("\n=== Interactive Configuration Mode ===\n")
             
-            # 语言配置
+            # Language configuration
             language = click.prompt(
                 "Language (en/zh)", 
                 type=click.Choice(['en', 'zh']),
@@ -64,7 +64,7 @@ def config(interactive, language, language_model, model, endpoint, api_key):
             )
             config_manager.update_config('language', language)
             
-            # 语言模型服务配置
+            # Language model service configuration
             language_model = click.prompt(
                 "Language Model Service",
                 type=str,
@@ -72,7 +72,7 @@ def config(interactive, language, language_model, model, endpoint, api_key):
             )
             config_manager.update_config('language_model', language_model)
             
-            # 模型名称配置
+            # Model name configuration
             model = click.prompt(
                 "Model Name",
                 type=str,
@@ -80,7 +80,7 @@ def config(interactive, language, language_model, model, endpoint, api_key):
             )
             config_manager.update_config('model', model)
             
-            # 模型端点配置
+            # Model endpoint configuration
             endpoint = click.prompt(
                 "Model Endpoint",
                 type=str,
@@ -88,7 +88,7 @@ def config(interactive, language, language_model, model, endpoint, api_key):
             )
             config_manager.update_config('endpoint', endpoint)
             
-            # API密钥配置
+            # API key configuration
             api_key = click.prompt(
                 "API Key",
                 type=str,
@@ -120,7 +120,7 @@ def config(interactive, language, language_model, model, endpoint, api_key):
                 click.echo("API key updated")
             
             if not any([language, language_model, model, endpoint, api_key]):
-                # 显示当前配置
+                # Display current configuration
                 click.echo("\nCurrent configuration:")
                 click.echo(f"Language: {current_config['language']}")
                 click.echo(f"Language Model Service: {current_config['language_model']}")

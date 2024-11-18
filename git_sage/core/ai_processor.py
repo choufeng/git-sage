@@ -11,14 +11,14 @@ class AIProcessor:
         self.model = self._setup_model()
     
     def _setup_model(self) -> OllamaLLM:
-        """设置Ollama实例"""
+        """Setup Ollama instance"""
         return OllamaLLM(
             model=self.config_manager.get_model(),
             base_url=self.config_manager.get_model_endpoint()
         )
     
     def _call_language_model(self, prompt: str) -> str:
-        """调用语言模型服务"""
+        """Call language model service"""
         try:
             prompt_template = ChatPromptTemplate.from_template("{input}")
             output_parser = StrOutputParser()
@@ -29,7 +29,7 @@ class AIProcessor:
             raise Exception(f"Failed to call language model: {e}") from e
     
     def _parse_response(self, response: str) -> Dict[str, str]:
-        """解析AI响应"""
+        """Parse AI response"""
         lines = [line.strip() for line in response.strip().split('\n') if line.strip()]
         analysis = {}
         body_lines = []
@@ -65,7 +65,7 @@ class AIProcessor:
         return analysis
     
     def process_diff(self, diff_content: str) -> str:
-        """处理git diff内容并生成提交信息"""
+        """Process git diff content and generate commit message"""
         try:
             language = self.config_manager.get_language()
             
@@ -95,13 +95,13 @@ Remember:
 
 Your response:"""
             
-            # 调用语言模型获取分析结果
+            # Call language model to get analysis result
             response = self._call_language_model(prompt)
             
-            # 解析响应
+            # Parse response
             analysis = self._parse_response(response)
             
-            # 格式化提交信息
+            # Format commit message
             return f"{analysis['type']}: {analysis['subject']}\n\n{analysis['body']}"
             
         except Exception as e:
