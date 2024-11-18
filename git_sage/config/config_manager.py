@@ -4,11 +4,11 @@ from typing import Dict, Optional
 
 class ConfigManager:
     DEFAULT_CONFIG = {
-        "language": "en",  # 默认使用英文
-        "language_model": "ollama",  # 选择使用的语言模型服务（如ollama或其他在线服务）
-        "model": "codellama",  # 选择具体的模型名称
-        "endpoint": "http://localhost:11434",  # 模型服务地址
-        "api_key": "ollama",  # 默认key
+        "language": "English",  # 默认使用英文，但用户可以配置任何语言名称
+        "language_model": "ollama",
+        "model": "codellama",
+        "endpoint": "http://localhost:11434",
+        "api_key": "ollama"
     }
     
     def __init__(self):
@@ -38,10 +38,10 @@ class ConfigManager:
     
     def get_language(self) -> str:
         """获取当前配置的语言"""
-        return self.config.get("language", "en")
+        return self.config.get("language", "English")
     
     def get_language_model(self) -> str:
-        """获取当前使用的语言模型服务类型（如ollama或其他在线服务）"""
+        """获取当前使用的语言模型服务类型"""
         return self.config.get("language_model", "ollama")
     
     def get_model(self) -> str:
