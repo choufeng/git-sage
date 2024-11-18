@@ -19,6 +19,7 @@ setup(
     entry_points={
         'console_scripts': [
             'gsg=git_sage.cli.main:cli',
+            'gsg-setup=git_sage.setup_command:main',
         ],
     },
     python_requires='>=3.8',

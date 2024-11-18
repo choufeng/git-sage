@@ -21,12 +21,26 @@ cd git-sage
 
 # 安装
 pip install -e .
+
+# 运行初始配置向导
+gsg-setup
 ```
 
-## 使用方法
+## 配置
 
-1. 配置
+有多种方式可以配置Git Sage：
 
+1. 运行初始配置向导：
+```bash
+gsg-setup
+```
+
+2. 使用交互式配置：
+```bash
+gsg config -i
+```
+
+3. 单独设置配置项：
 ```bash
 # 查看当前配置
 gsg config
@@ -44,7 +58,9 @@ gsg config --api-key your-key
 gsg config --endpoint http://localhost:11434
 ```
 
-2. 生成提交信息
+## 使用方法
+
+生成提交信息：
 
 ```bash
 # 首先使用git add暂存你的更改
@@ -103,7 +119,7 @@ gsg a
 - endpoint: 模型服务地址 (默认为 http://localhost:11434)
 - api_key: API密钥 (默认为 ollama)
 
-所有配置项都可以通过 `gsg config --<配置项> <值>` 来修改。
+所有配置项都可以通过 `gsg config --<配置项> <值>` 来修改，或使用交互式配置 `gsg config -i`。
 
 ## 依赖项
 
