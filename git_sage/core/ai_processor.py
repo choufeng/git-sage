@@ -1,6 +1,6 @@
 from typing import Dict, Union
 from langchain_ollama import OllamaLLM
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import os
@@ -10,7 +10,7 @@ class AIProcessor:
         self.config_manager = config_manager
         self.model = self._setup_model()
     
-    def _setup_model(self) -> Union[OllamaLLM, OpenAI]:
+    def _setup_model(self) -> Union[OllamaLLM, ChatOpenAI]:
         """Setup language model based on configuration"""
         language_model = self.config_manager.get_language_model()
         
@@ -21,7 +21,7 @@ class AIProcessor:
                 base_url=self.config_manager.get_model_endpoint()
             )
         elif language_model == "openrouter":
-            return OpenAI(
+            return ChatOpenAI(
                 model=self.config_manager.get_model(),
                 openai_api_key=self.config_manager.get_api_key(),
                 base_url=self.config_manager.get_model_endpoint(),

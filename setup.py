@@ -14,6 +14,8 @@ setup(
         'langchain-community>=0.0.10',
         'langchain-ollama>=0.2.0',
         'langchain-core>=0.3.0',
+        'langchain-openai>=0.0.5',
+        'openai>=1.0.0',
         'ollama>=0.3.0',
     ],
     entry_points={
