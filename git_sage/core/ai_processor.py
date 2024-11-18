@@ -2,7 +2,7 @@ from typing import Dict, List
 from langgraph.graph import Graph
 from langgraph.prebuilt import ToolExecutor
 from operator import itemgetter
-from langchain_ollama import Ollama
+from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
@@ -12,9 +12,9 @@ class AIProcessor:
         self.workflow = self._create_workflow()
         self.model = self._setup_model()
     
-    def _setup_model(self) -> Ollama:
+    def _setup_model(self) -> OllamaLLM:
         """设置Ollama实例"""
-        return Ollama(
+        return OllamaLLM(
             model=self.config_manager.get_model(),
             base_url=self.config_manager.get_model_endpoint()
         )

@@ -6,7 +6,7 @@ class ConfigManager:
     DEFAULT_CONFIG = {
         "language": "English",  # 默认使用英文，但用户可以配置任何语言名称
         "language_model": "ollama",
-        "model": "codellama",
+        "model": "qwen2.5-coder:7b",
         "endpoint": "http://localhost:11434",
         "api_key": "ollama"
     }
@@ -46,7 +46,7 @@ class ConfigManager:
     
     def get_model(self) -> str:
         """获取当前选择的具体模型名称"""
-        return self.config.get("model", "codellama")
+        return self.config.get("model", "qwen2.5-coder:7b")
     
     def get_model_endpoint(self) -> str:
         """获取模型服务地址"""
