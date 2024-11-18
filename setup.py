@@ -10,6 +10,8 @@ setup(
         'gitpython>=3.1.40',
         'click>=8.1.7',
         'pyyaml>=6.0.1',
+        'requests>=2.31.0',
+        'langchain-community>=0.0.10',
     ],
     entry_points={
         'console_scripts': [

@@ -39,6 +39,9 @@ gsg config --model ollama
 
 # 设置API密钥
 gsg config --api-key your-key
+
+# 设置模型服务地址
+gsg config --endpoint http://localhost:11434
 ```
 
 2. 生成提交信息
@@ -55,14 +58,18 @@ gsg a
 
 配置文件位于 `~/.git-sage/config.yml`，包含以下配置项：
 
-- language: 提交信息语言 (en/zh)
-- model: AI模型选择 (默认为ollama)
-- api_key: API密钥
+- language: 提交信息语言 (默认为 en)
+- language_model: 选择使用的语言模型服务 (默认为 ollama)
+- model: 选择具体的模型名称 (默认为 codellama)
+- endpoint: 模型服务地址 (默认为 http://localhost:11434)
+- api_key: API密钥 (默认为 ollama)
+
+所有配置项都可以通过 `gsg config --<配置项> <值>` 来修改。
 
 ## 依赖项
 
 - Python >= 3.8
-- langgraph >= 0.0.10
+- langgraph >= 0.2.50
 - gitpython >= 3.1.40
 - click >= 8.1.7
 - pyyaml >= 6.0.1

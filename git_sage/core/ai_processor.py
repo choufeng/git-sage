@@ -1,29 +1,28 @@
-import requests
 from typing import Dict, List
 from langgraph.graph import Graph
 from langgraph.prebuilt import ToolExecutor
 from operator import itemgetter
+from langchain_community.chat_models import ChatOllama
+from langchain.schema import HumanMessage
 
 class AIProcessor:
     def __init__(self, config_manager):
         self.config_manager = config_manager
         self.workflow = self._create_workflow()
+        self.chat_model = self._setup_chat_model()
+    
+    def _setup_chat_model(self) -> ChatOllama:
+        """设置ChatOllama实例"""
+        return ChatOllama(
+            model=self.config_manager.get_model(),
+            base_url=self.config_manager.get_model_endpoint()
+        )
     
     def _call_language_model(self, prompt: str) -> str:
         """调用语言模型服务"""
-        model = self.config_manager.get_model()
-        endpoint = self.config_manager.get_model_endpoint()
-        
-        data = {
-            "model": model,
-            "prompt": prompt,
-            "stream": False
-        }
-        
         try:
-            response = requests.post(f"{endpoint}/api/generate", json=data)
-            response.raise_for_status()
-            return response.json()["response"]
+            response = self.chat_model.invoke([HumanMessage(content=prompt)])
+            return response.content
         except Exception as e:
             raise Exception(f"Failed to call language model: {e}") from e
     

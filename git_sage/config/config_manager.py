@@ -7,7 +7,7 @@ class ConfigManager:
         "language": "en",  # 默认使用英文
         "language_model": "ollama",  # 选择使用的语言模型服务（如ollama或其他在线服务）
         "model": "codellama",  # 选择具体的模型名称
-        "model_endpoint": "http://localhost:11434",  # 模型服务地址
+        "endpoint": "http://localhost:11434",  # 模型服务地址
         "api_key": "ollama",  # 默认key
     }
     
@@ -50,7 +50,7 @@ class ConfigManager:
     
     def get_model_endpoint(self) -> str:
         """获取模型服务地址"""
-        return self.config.get("model_endpoint", "http://localhost:11434")
+        return self.config.get("endpoint", "http://localhost:11434")
     
     def get_api_key(self) -> str:
         """获取API密钥"""
