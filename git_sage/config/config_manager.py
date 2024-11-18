@@ -23,8 +23,10 @@ class ConfigManager:
         """Load configuration file, create default config if it doesn't exist"""
         if not os.path.exists(self.config_path):
             os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
-            self.save_config(self.DEFAULT_CONFIG)
-            return self.DEFAULT_CONFIG
+            initial_config = self.DEFAULT_CONFIG.copy()
+            initial_config["endpoint"] = self.OLLAMA_ENDPOINT  # 设置初始endpoint
+            self.save_config(initial_config)
+            return initial_config
         
         try:
             with open(self.config_path, 'r', encoding='utf-8') as f:
@@ -53,16 +55,8 @@ class ConfigManager:
         return self.config.get("model", "qwen2.5-coder:7b")
     
     def get_model_endpoint(self) -> str:
-        """Get model service endpoint based on language model type"""
-        language_model = self.get_language_model()
-        if language_model == "ollama":
-            return self.OLLAMA_ENDPOINT
-        elif language_model == "openrouter":
-            return self.OPENROUTER_ENDPOINT
-        elif language_model == "deepseek":
-            return self.DEEPSEEK_ENDPOINT
-        else:
-            return ""  # 其他模型需要用户明确配置endpoint
+        """Get model service endpoint"""
+        return self.config.get("endpoint", self.OLLAMA_ENDPOINT)
     
     def get_api_key(self) -> str:
         """Get API key"""
@@ -70,17 +64,27 @@ class ConfigManager:
     
     def update_config(self, key: str, value: str) -> None:
         """Update configuration item"""
-        self.config[key] = value
-        
-        # 当更新language_model时，自动更新endpoint为对应的默认值
+        # 如果是更新language_model
         if key == "language_model":
-            if value == "ollama":
-                self.config["endpoint"] = self.OLLAMA_ENDPOINT
-            elif value == "openrouter":
-                self.config["endpoint"] = self.OPENROUTER_ENDPOINT
-            elif value == "deepseek":
-                self.config["endpoint"] = self.DEEPSEEK_ENDPOINT
-            else:
-                self.config["endpoint"] = ""
+            # 只有当language_model真的改变时才更新endpoint
+            if value != self.config.get("language_model"):
+                if value == "ollama":
+                    self.config["endpoint"] = self.OLLAMA_ENDPOINT
+                elif value == "openrouter":
+                    self.config["endpoint"] = self.OPENROUTER_ENDPOINT
+                elif value == "deepseek":
+                    self.config["endpoint"] = self.DEEPSEEK_ENDPOINT
+                else:
+                    self.config["endpoint"] = ""
+            # 无论是否更新endpoint，都要更新language_model
+            self.config["language_model"] = value
+        
+        # 如果是直接设置endpoint
+        elif key == "endpoint":
+            self.config["endpoint"] = value
+        
+        # 其他配置项的更新
+        else:
+            self.config[key] = value
         
         self.save_config(self.config)
