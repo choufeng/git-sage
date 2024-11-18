@@ -67,7 +67,7 @@ gsg config --endpoint http://localhost:11434
 git add .
 
 # 然后使用gsg生成提交信息并提交
-gsg a
+gsg c
 ```
 
 ## 提交信息规范

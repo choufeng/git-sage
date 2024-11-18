@@ -69,7 +69,7 @@ Generate commit message:
 git add .
 
 # Then use gsg to generate commit message and commit
-gsg a
+gsg c
 ```
 
 ## Commit Message Convention

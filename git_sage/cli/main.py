@@ -10,7 +10,7 @@ def cli():
 
 @cli.command()
 @click.argument('files', nargs=-1)
-def a(files):
+def c(files):
     """Analyze staged changes and generate commit message"""
     try:
         # 初始化各个模块
