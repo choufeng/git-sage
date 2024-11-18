@@ -1,5 +1,6 @@
-from typing import Dict
+from typing import Dict, Union
 from langchain_ollama import OllamaLLM
+from langchain_openai import OpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import os
@@ -7,15 +8,30 @@ import os
 class AIProcessor:
     def __init__(self, config_manager):
         self.config_manager = config_manager
-        os.environ["OLLAMA_BASE_URL"] = self.config_manager.get_model_endpoint()
         self.model = self._setup_model()
     
-    def _setup_model(self) -> OllamaLLM:
-        """Setup Ollama instance"""
-        return OllamaLLM(
-            model=self.config_manager.get_model(),
-            base_url=self.config_manager.get_model_endpoint()
-        )
+    def _setup_model(self) -> Union[OllamaLLM, OpenAI]:
+        """Setup language model based on configuration"""
+        language_model = self.config_manager.get_language_model()
+        
+        if language_model == "ollama":
+            os.environ["OLLAMA_BASE_URL"] = self.config_manager.get_model_endpoint()
+            return OllamaLLM(
+                model=self.config_manager.get_model(),
+                base_url=self.config_manager.get_model_endpoint()
+            )
+        elif language_model == "openrouter":
+            return OpenAI(
+                model=self.config_manager.get_model(),
+                openai_api_key=self.config_manager.get_api_key(),
+                base_url=self.config_manager.get_model_endpoint(),
+                default_headers={
+                    "HTTP-Referer": "git-sage-cli",
+                    "X-Title": "Git-Sage"
+                }
+            )
+        else:
+            raise ValueError(f"Unsupported language model service: {language_model}")
     
     def _call_language_model(self, prompt: str) -> str:
         """Call language model service"""
