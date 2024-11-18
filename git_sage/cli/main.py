@@ -13,6 +13,7 @@ class ResponseLanguage(str, Enum):
 class ModelService(str, Enum):
     OLLAMA = 'ollama'
     OPENROUTER = 'openrouter'
+    DEEPSEEK = 'deepseek'
 
 @click.group()
 def cli():
@@ -89,7 +90,8 @@ def set():
         # Service mapping
         service_map = {
             'Ollama': 'ollama',
-            'OpenRouter': 'openrouter'
+            'OpenRouter': 'openrouter',
+            'DeepSeek': 'deepseek'
         }
         rev_service_map = {v: k for k, v in service_map.items()}
         

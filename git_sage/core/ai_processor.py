@@ -30,6 +30,12 @@ class AIProcessor:
                     "X-Title": "Git-Sage"
                 }
             )
+        elif language_model == "deepseek":
+            return ChatOpenAI(
+                model=self.config_manager.get_model(),
+                openai_api_key=self.config_manager.get_api_key(),
+                base_url=self.config_manager.get_model_endpoint()
+            )
         else:
             raise ValueError(f"Unsupported language model service: {language_model}")
     

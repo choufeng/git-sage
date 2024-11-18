@@ -5,7 +5,7 @@ from typing import Dict, Optional
 class ConfigManager:
     DEFAULT_CONFIG = {
         "language": "en",  # Default to English (en/zh-CN/zh-TW)
-        "language_model": "ollama",
+        "language_model": "ollama",  # 可选: ollama/openrouter/deepseek
         "model": "qwen2.5-coder:7b",
         "api_key": "ollama"
     }
@@ -13,6 +13,7 @@ class ConfigManager:
     # 默认端点地址
     OLLAMA_ENDPOINT = "http://localhost:11434"
     OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1"
+    DEEPSEEK_ENDPOINT = "https://api.deepseek.com/v1"
     
     def __init__(self):
         self.config_path = os.path.expanduser("~/.git-sage/config.yml")
@@ -58,6 +59,8 @@ class ConfigManager:
             return self.OLLAMA_ENDPOINT
         elif language_model == "openrouter":
             return self.OPENROUTER_ENDPOINT
+        elif language_model == "deepseek":
+            return self.DEEPSEEK_ENDPOINT
         else:
             return ""  # 其他模型需要用户明确配置endpoint
     
@@ -75,6 +78,8 @@ class ConfigManager:
                 self.config["endpoint"] = self.OLLAMA_ENDPOINT
             elif value == "openrouter":
                 self.config["endpoint"] = self.OPENROUTER_ENDPOINT
+            elif value == "deepseek":
+                self.config["endpoint"] = self.DEEPSEEK_ENDPOINT
             else:
                 self.config["endpoint"] = ""
         
