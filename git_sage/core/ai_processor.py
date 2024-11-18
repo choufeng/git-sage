@@ -98,7 +98,23 @@ class AIProcessor:
         try:
             language = self.config_manager.get_language()
             
-            prompt = f"""You are a professional code reviewer and commit message generator. Please carefully analyze the following git diff content and generate a structured commit message. Follow this thought process:
+            # 构建系统角色指令
+            system_instruction = f"""IMPORTANT: You MUST respond in {language} language.
+For en: Use English only
+For zh-CN: Use Simplified Chinese (简体中文) only
+For zh-TW: Use Traditional Chinese (繁體中文) only
+
+Your response format MUST be:
+type: [tag]
+subject: [brief description]
+body: [detailed explanation]
+
+All text in the response (including type, subject, and body) MUST be in the specified language ({language}).
+"""
+            
+            prompt = f"""{system_instruction}
+
+You are a professional code reviewer and commit message generator. Please carefully analyze the following git diff content and generate a structured commit message. Follow this thought process:
 
 1. Initial Understanding Phase
 - Quick overview of the entire diff to form a general impression
@@ -120,8 +136,6 @@ class AIProcessor:
 - Double-check if all changes are correctly understood
 - Confirm if the chosen change type tag is most accurate
 - Verify if the description completely and accurately reflects the essence of changes
-
-Language requirement: {language} (en for English, zh for Chinese)
 
 Commit Tags Explanation:
 
@@ -149,26 +163,8 @@ The diff content is:
 
 {diff_content}
 
-You must respond in exactly this format:
-type: [choose the most appropriate tag from the above list]
-subject: [brief description, max 50 chars]
-body: [detailed explanation of the changes]
-
-Example of good format:
-type: docs
-subject: Update README with project features
-body: Convert README to English and improve documentation structure. Add detailed feature list and installation instructions. Include language support information.
-
-Remember:
-1. Keep the format exactly as shown
-2. Use {language} for all text (en for English, zh for Chinese)
-3. Choose type from the given tag options based on the nature of changes
-4. Keep subject under 50 characters
-5. Only describe changes shown in the diff
-6. Do not include any installation steps or commands in the message
-7. Choose the most specific and appropriate tag for the changes
-
-Begin your analysis:"""
+Remember: Your ENTIRE response MUST be in {language} language as specified above.
+"""
             
             # Call language model to get analysis result
             response = self._call_language_model(prompt)
