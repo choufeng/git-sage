@@ -1,15 +1,13 @@
-from typing import Dict, List
-from langgraph.graph import Graph
-from langgraph.prebuilt import ToolExecutor
-from operator import itemgetter
+from typing import Dict
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+import os
 
 class AIProcessor:
     def __init__(self, config_manager):
         self.config_manager = config_manager
-        self.workflow = self._create_workflow()
+        os.environ["OLLAMA_BASE_URL"] = self.config_manager.get_model_endpoint()
         self.model = self._setup_model()
     
     def _setup_model(self) -> OllamaLLM:
@@ -30,86 +28,81 @@ class AIProcessor:
         except Exception as e:
             raise Exception(f"Failed to call language model: {e}") from e
     
-    def _create_workflow(self) -> Graph:
-        """创建LangGraph工作流"""
+    def _parse_response(self, response: str) -> Dict[str, str]:
+        """解析AI响应"""
+        lines = [line.strip() for line in response.strip().split('\n') if line.strip()]
+        analysis = {}
+        body_lines = []
+        in_body = False
         
-        # 定义节点函数
-        def analyze_diff(state):
-            """分析git diff内容"""
-            diff_content = state["diff_content"]
+        for line in lines:
+            if ':' in line:
+                key, value = [part.strip() for part in line.split(':', 1)]
+                key = key.lower()
+                
+                if key == 'type' and not analysis.get('type'):
+                    analysis['type'] = value
+                elif key == 'subject' and not analysis.get('subject'):
+                    analysis['subject'] = value
+                elif key == 'body':
+                    in_body = True
+                    if value:
+                        body_lines.append(value)
+            elif in_body:
+                body_lines.append(line)
+        
+        if body_lines:
+            analysis['body'] = ' '.join(body_lines)
+        
+        # Set defaults if missing
+        if 'type' not in analysis:
+            analysis['type'] = 'docs'  # Default to docs type
+        if 'subject' not in analysis:
+            analysis['subject'] = 'Update documentation'  # Default subject
+        if 'body' not in analysis:
+            analysis['body'] = 'Update project documentation and improve clarity.'  # Default body
+            
+        return analysis
+    
+    def process_diff(self, diff_content: str) -> str:
+        """处理git diff内容并生成提交信息"""
+        try:
             language = self.config_manager.get_language()
             
-            prompt = f"""Please analyze the following git diff content and provide a response in {language} language:
+            prompt = f"""You are a commit message generator. Analyze the following git diff and generate a structured commit message in {language}. Focus only on describing the actual changes shown in the diff, not any potential follow-up actions.
 
-            {diff_content}
+The diff content is:
 
-            Please provide a concise commit message in the following format:
-            type: main type of change (feat/fix/docs/style/refactor/test/chore)
-            subject: brief description of changes (no more than 50 characters)
-            body: detailed explanation of changes
+{diff_content}
 
-            Please ensure the response follows this exact format, but use {language} language for all descriptions:
-            type: feat
-            subject: [your subject in {language}]
-            body: [your detailed explanation in {language}]
-            """
+You must respond in exactly this format:
+type: [choose one: feat/fix/docs/style/refactor/test/chore]
+subject: [brief description, max 50 chars]
+body: [detailed explanation of the changes shown in the diff]
+
+Example of good format:
+type: docs
+subject: Update README with project features
+body: Convert README to English and improve documentation structure. Add detailed feature list and installation instructions. Include language support information.
+
+Remember:
+1. Keep the format exactly as shown
+2. Use {language} for all text
+3. Choose type from the given options
+4. Keep subject under 50 characters
+5. Only describe changes shown in the diff
+6. Do not include any installation steps or commands in the message
+
+Your response:"""
             
             # 调用语言模型获取分析结果
             response = self._call_language_model(prompt)
             
             # 解析响应
-            lines = response.strip().split('\n')
-            analysis = {}
+            analysis = self._parse_response(response)
             
-            for line in lines:
-                if ':' in line:
-                    key, value = line.split(':', 1)
-                    key = key.strip().lower()
-                    value = value.strip()
-                    if key in ['type', 'subject', 'body']:
-                        analysis[key] = value
+            # 格式化提交信息
+            return f"{analysis['type']}: {analysis['subject']}\n\n{analysis['body']}"
             
-            # 确保所有必需字段都存在
-            if not all(key in analysis for key in ['type', 'subject', 'body']):
-                raise Exception("Invalid AI response format")
-            
-            return {
-                **state,
-                "analysis": analysis
-            }
-        
-        def format_message(state):
-            """格式化提交信息"""
-            analysis = state["analysis"]
-            return {
-                **state,
-                "commit_message": f"{analysis['type']}: {analysis['subject']}\n\n{analysis['body']}"
-            }
-        
-        # 创建工作流图
-        workflow = Graph()
-        
-        # 添加节点
-        workflow.add_node("analyze_diff", analyze_diff)
-        workflow.add_node("format_message", format_message)
-        
-        # 设置边
-        workflow.add_edge("analyze_diff", "format_message")
-        
-        # 设置入口和出口
-        workflow.set_entry_point("analyze_diff")
-        workflow.set_finish_point("format_message")
-        
-        return workflow.compile()
-    
-    def process_diff(self, diff_content: str) -> str:
-        """处理git diff内容并生成提交信息"""
-        try:
-            # 运行工作流
-            result = self.workflow.invoke({
-                "diff_content": diff_content
-            })
-            
-            return result["commit_message"]
         except Exception as e:
             raise Exception(f"Failed to process diff: {e}") from e
