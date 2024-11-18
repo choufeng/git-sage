@@ -7,9 +7,12 @@ class ConfigManager:
         "language": "en",  # Default to English (en/zh-CN/zh-TW)
         "language_model": "ollama",
         "model": "qwen2.5-coder:7b",
-        "endpoint": "http://localhost:11434",
         "api_key": "ollama"
     }
+    
+    # 默认端点地址
+    OLLAMA_ENDPOINT = "http://localhost:11434"
+    OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1"
     
     def __init__(self):
         self.config_path = os.path.expanduser("~/.git-sage/config.yml")
@@ -49,8 +52,14 @@ class ConfigManager:
         return self.config.get("model", "qwen2.5-coder:7b")
     
     def get_model_endpoint(self) -> str:
-        """Get model service endpoint"""
-        return self.config.get("endpoint", "http://localhost:11434")
+        """Get model service endpoint based on language model type"""
+        language_model = self.get_language_model()
+        if language_model == "ollama":
+            return self.OLLAMA_ENDPOINT
+        elif language_model == "openrouter":
+            return self.OPENROUTER_ENDPOINT
+        else:
+            return ""  # 其他模型需要用户明确配置endpoint
     
     def get_api_key(self) -> str:
         """Get API key"""
@@ -59,4 +68,14 @@ class ConfigManager:
     def update_config(self, key: str, value: str) -> None:
         """Update configuration item"""
         self.config[key] = value
+        
+        # 当更新language_model时，自动更新endpoint为对应的默认值
+        if key == "language_model":
+            if value == "ollama":
+                self.config["endpoint"] = self.OLLAMA_ENDPOINT
+            elif value == "openrouter":
+                self.config["endpoint"] = self.OPENROUTER_ENDPOINT
+            else:
+                self.config["endpoint"] = ""
+        
         self.save_config(self.config)
