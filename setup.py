@@ -17,6 +17,7 @@ setup(
         'langchain-openai>=0.0.5',
         'openai>=1.0.0',
         'ollama>=0.3.0',
+        'inquirer>=3.1.3',
     ],
     entry_points={
         'console_scripts': [

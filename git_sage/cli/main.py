@@ -1,7 +1,20 @@
 import click
+import inquirer
+from enum import Enum
 from git_sage.config.config_manager import ConfigManager
 from git_sage.core.git_operations import GitOperations
 from git_sage.core.ai_processor import AIProcessor
+
+class ResponseLanguage(str, Enum):
+    ENGLISH = 'en'
+    SIMPLIFIED_CHINESE = 'zh-CN'
+    TRADITIONAL_CHINESE = 'zh-TW'
+    JAPANESE = 'ja'
+    KOREAN = 'ko'
+
+class ModelService(str, Enum):
+    OLLAMA = 'ollama'
+    OPENROUTER = 'openrouter'
 
 @click.group()
 def cli():
@@ -42,7 +55,7 @@ def c(files):
 
 @cli.command()
 @click.option('--interactive', '-i', is_flag=True, help='Interactive configuration mode')
-@click.option('--language', type=click.Choice(['en', 'zh']), help='Set language (en/zh)')
+@click.option('--language', type=click.Choice(['en', 'zh-CN', 'zh-TW', 'ja', 'ko']), help='Set response language')
 @click.option('--language-model', type=str, help='Set language model service (e.g., ollama)')
 @click.option('--model', type=str, help='Set specific model name (e.g., codellama)')
 @click.option('--endpoint', type=str, help='Set model service endpoint')
@@ -56,21 +69,56 @@ def config(interactive, language, language_model, model, endpoint, api_key):
         if interactive:
             click.echo("\n=== Interactive Configuration Mode ===\n")
             
-            # Language configuration
-            language = click.prompt(
-                "Language (en/zh)", 
-                type=click.Choice(['en', 'zh']),
-                default=current_config['language']
-            )
-            config_manager.update_config('language', language)
+            # Language mapping
+            lang_map = {
+                'English': 'en',
+                '简体中文': 'zh-CN',
+                '繁體中文': 'zh-TW',
+                '日本語': 'ja',
+                '한국어': 'ko'
+            }
+            
+            # Reverse mapping for default value
+            rev_lang_map = {v: k for k, v in lang_map.items()}
+            
+            # Response language configuration
+            questions = [
+                inquirer.List(
+                    'language',
+                    message="Response Language",
+                    choices=list(lang_map.keys()),
+                    default=rev_lang_map.get(current_config['language'], 'English')
+                )
+            ]
+            
+            answers = inquirer.prompt(questions)
+            if not answers:
+                return
+            
+            config_manager.update_config('language', lang_map[answers['language']])
+            
+            # Service mapping
+            service_map = {
+                'Ollama': 'ollama',
+                'OpenRouter': 'openrouter'
+            }
+            rev_service_map = {v: k for k, v in service_map.items()}
             
             # Language model service configuration
-            language_model = click.prompt(
-                "Language Model Service",
-                type=str,
-                default=current_config['language_model']
-            )
-            config_manager.update_config('language_model', language_model)
+            questions = [
+                inquirer.List(
+                    'language_model',
+                    message="Language Model Service",
+                    choices=list(service_map.keys()),
+                    default=rev_service_map.get(current_config['language_model'], 'Ollama')
+                )
+            ]
+            
+            answers = inquirer.prompt(questions)
+            if not answers:
+                return
+                
+            config_manager.update_config('language_model', service_map[answers['language_model']])
             
             # Model name configuration
             model = click.prompt(
@@ -101,7 +149,7 @@ def config(interactive, language, language_model, model, endpoint, api_key):
         else:
             if language:
                 config_manager.update_config('language', language)
-                click.echo(f"Language set to: {language}")
+                click.echo(f"Response language set to: {language}")
                 
             if language_model:
                 config_manager.update_config('language_model', language_model)
@@ -122,7 +170,7 @@ def config(interactive, language, language_model, model, endpoint, api_key):
             if not any([language, language_model, model, endpoint, api_key]):
                 # Display current configuration
                 click.echo("\nCurrent configuration:")
-                click.echo(f"Language: {current_config['language']}")
+                click.echo(f"Response Language: {current_config['language']}")
                 click.echo(f"Language Model Service: {current_config['language_model']}")
                 click.echo(f"Model Name: {current_config['model']}")
                 click.echo(f"Model Endpoint: {current_config['endpoint']}")

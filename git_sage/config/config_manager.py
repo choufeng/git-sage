@@ -4,7 +4,7 @@ from typing import Dict, Optional
 
 class ConfigManager:
     DEFAULT_CONFIG = {
-        "language": "en",  # Default to English
+        "language": "en",  # Default to English (en/zh-CN/zh-TW/ja/ko)
         "language_model": "ollama",
         "model": "qwen2.5-coder:7b",
         "endpoint": "http://localhost:11434",
@@ -38,7 +38,7 @@ class ConfigManager:
     
     def get_language(self) -> str:
         """Get currently configured language"""
-        return self.config.get("language", "English")
+        return self.config.get("language", "en")
     
     def get_language_model(self) -> str:
         """Get current language model service type"""
