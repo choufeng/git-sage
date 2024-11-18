@@ -1,127 +1,129 @@
 # Git Sage
 
-Git Sage 是一个AI驱动的Git助手，它可以帮助你生成更好的提交信息。
+[中文文档](README_CN.md)
 
-## 功能特点
+Git Sage is an AI-powered Git assistant that helps you generate better commit messages.
 
-- 自动分析已暂存的更改
-- 使用AI生成规范的提交信息
-- 支持中英文提交信息
-- 支持自定义AI模型配置
-- 简单易用的命令行界面
+## Features
 
-## 安装
+- Automatically analyze staged changes
+- Generate standardized commit messages using AI
+- Support for both English and Chinese commit messages
+- Customizable AI model configuration
+- Simple and easy-to-use command line interface
+
+## Installation
 
 ```bash
-# 克隆仓库
+# Clone the repository
 git clone https://github.com/yourusername/git-sage.git
 
-# 进入项目目录
+# Navigate to project directory
 cd git-sage
 
-# 安装
+# Install
 pip install -e .
 
-# 运行初始配置向导
+# Run initial setup wizard
 gsg-setup
 ```
 
-## 配置
+## Configuration
 
-有多种方式可以配置Git Sage：
+There are multiple ways to configure Git Sage:
 
-1. 运行初始配置向导：
+1. Run the initial setup wizard:
 ```bash
 gsg-setup
 ```
 
-2. 使用交互式配置：
+2. Use interactive configuration:
 ```bash
 gsg config -i
 ```
 
-3. 单独设置配置项：
+3. Set individual configuration items:
 ```bash
-# 查看当前配置
+# View current configuration
 gsg config
 
-# 设置语言（支持 en/zh）
+# Set language (supports en/zh)
 gsg config --language zh
 
-# 设置AI模型
+# Set AI model
 gsg config --model ollama
 
-# 设置API密钥
+# Set API key
 gsg config --api-key your-key
 
-# 设置模型服务地址
+# Set model service endpoint
 gsg config --endpoint http://localhost:11434
 ```
 
-## 使用方法
+## Usage
 
-生成提交信息：
+Generate commit message:
 
 ```bash
-# 首先使用git add暂存你的更改
+# First stage your changes using git add
 git add .
 
-# 然后使用gsg生成提交信息并提交
+# Then use gsg to generate commit message and commit
 gsg a
 ```
 
-## 提交信息规范
+## Commit Message Convention
 
-提交信息遵循 Conventional Commit 规范，格式如下：
+Commit messages follow the Conventional Commit specification with the following format:
 
 ```
-{标签}: 变更的主题或标题
-可选的详细描述
+{tag}: subject or title of the change
+Optional detailed description
 ```
 
-### 提交标签说明
+### Commit Tags Explanation
 
-#### 补丁版本 (PATCH)
-以下标签会产生补丁版本更新：
+#### Patch Version (PATCH)
+The following tags will trigger a patch version update:
 
-- `Fix`: 用于修复bug
-- `Build`: 仅构建过程的变更
-- `Maint`/`Maintenance`: 小型维护任务，如技术债务清理、重构、构建过程变更和非破坏性依赖更新
-- `Test`: 用于应用程序端到端测试
-- `Patch`: 当其他补丁标签不适用时使用的通用补丁标签
+- `Fix`: For bug fixes
+- `Build`: For build process changes only
+- `Maint`/`Maintenance`: For small maintenance tasks like technical debt cleanup, refactoring, build process changes, and non-breaking dependency updates
+- `Test`: For application end-to-end tests
+- `Patch`: Generic patch tag when other patch tags don't apply
 
-#### 次要版本 (MINOR)
-以下标签会产生次要版本更新：
+#### Minor Version (MINOR)
+The following tags will trigger a minor version update:
 
-- `Feat`/`Feature`/`New`: 实现新功能
-- `Minor`: 当其他次要版本标签不适用时使用的通用标签
-- `Update`: 对现有功能的向后兼容增强
+- `Feat`/`Feature`/`New`: For implementing new features
+- `Minor`: Generic minor tag when other minor tags don't apply
+- `Update`: For backward-compatible enhancements to existing features
 
-#### 主要版本 (MAJOR)
-以下标签会产生主要版本更新：
+#### Major Version (MAJOR)
+The following tags will trigger a major version update:
 
-- `Breaking`: 用于向后不兼容的增强或功能
-- `Major`: 当其他主要版本标签不适用时使用的通用标签
+- `Breaking`: For backward-incompatible enhancements or features
+- `Major`: Generic major tag when other major tags don't apply
 
-#### 无版本更新 (NO-OP)
-以下标签不会触发版本更新：
+#### No Version Update (NO-OP)
+The following tags will not trigger a version update:
 
-- `Docs`: 仅文档变更
-- `Chore`: 用于其他不会影响实际环境的变更，如代码注释、非包或应用程序文件的变更、单元测试等
+- `Docs`: For documentation changes only
+- `Chore`: For other changes that don't affect the actual environment, such as code comments, changes to non-package/application files, unit tests, etc.
 
-## 配置说明
+## Configuration Details
 
-配置文件位于 `~/.git-sage/config.yml`，包含以下配置项：
+The configuration file is located at `~/.git-sage/config.yml` and contains the following settings:
 
-- language: 提交信息语言 (默认为 en)
-- language_model: 选择使用的语言模型服务 (默认为 ollama)
-- model: 选择具体的模型名称 (默认为 codellama)
-- endpoint: 模型服务地址 (默认为 http://localhost:11434)
-- api_key: API密钥 (默认为 ollama)
+- language: Commit message language (defaults to en)
+- language_model: Choose the language model service to use (defaults to ollama)
+- model: Choose the specific model name (defaults to codellama)
+- endpoint: Model service address (defaults to http://localhost:11434)
+- api_key: API key (defaults to ollama)
 
-所有配置项都可以通过 `gsg config --<配置项> <值>` 来修改，或使用交互式配置 `gsg config -i`。
+All configuration items can be modified using `gsg config --<config-item> <value>` or through interactive configuration with `gsg config -i`.
 
-## 依赖项
+## Dependencies
 
 - Python >= 3.8
 - langgraph >= 0.2.50
@@ -129,6 +131,6 @@ gsg a
 - click >= 8.1.7
 - pyyaml >= 6.0.1
 
-## 许可证
+## License
 
 MIT License
