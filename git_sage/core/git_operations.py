@@ -76,7 +76,6 @@ class GitOperations:
                     temp_file.write(message)
                     temp_file.write("\n\n# Please edit your commit message above.")
                     temp_file.write("\n# Save and exit the editor to proceed with the commit.")
-                    temp_file.write("\n# Interrupting the edit will cancel the commit.")
                     temp_file_path = temp_file.name
 
                 try:
