@@ -12,6 +12,9 @@ setup(
         'pyyaml>=6.0.1',
         'requests>=2.31.0',
         'langchain-community>=0.0.10',
+        'langchain-ollama>=0.2.0',
+        'langchain-core>=0.3.0',
+        'ollama>=0.3.0',
     ],
     entry_points={
         'console_scripts': [
