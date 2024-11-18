@@ -82,11 +82,7 @@ class GitOperations:
                 try:
                     # 使用系统默认编辑器打开临时文件
                     editor = os.environ.get('EDITOR', 'vim')
-                    exit_code = os.system(f'{editor} {temp_file_path}')
-                    
-                    if exit_code != 0:
-                        print("提交已取消。")
-                        return False
+                    os.system(f'{editor} {temp_file_path}')
 
                     # 读取编辑后的提交信息
                     with open(temp_file_path, 'r') as temp_file:
@@ -96,13 +92,21 @@ class GitOperations:
                                 edited_message += line
                         edited_message = edited_message.strip()
 
+                    # 只在消息为空时取消提交
                     if not edited_message:
                         print("提交信息为空，提交已取消。")
                         return False
-
-                    # 执行提交
-                    self.repo.index.commit(edited_message)
-                    return True
+                    
+                    # 询问用户是否确认提交
+                    confirm_input = input("\n是否确认提交？[Y/n] ").strip().lower()
+                    if confirm_input == '' or confirm_input == 'y':
+                        # 执行提交
+                        self.repo.index.commit(edited_message)
+                        print("提交已完成。")
+                        return True
+                    else:
+                        print("提交已取消。")
+                        return False
 
                 finally:
                     # 清理临时文件
