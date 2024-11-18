@@ -13,18 +13,23 @@ class AIProcessor:
     def _setup_model(self) -> Union[OllamaLLM, ChatOpenAI]:
         """Setup language model based on configuration"""
         language_model = self.config_manager.get_language_model()
+        model_name = self.config_manager.get_model()
+        endpoint = self.config_manager.get_model_endpoint()
+        api_key = self.config_manager.get_api_key()
+        
+        print(f"Setting up model: {language_model} ({model_name}) at {endpoint}")
         
         if language_model == "ollama":
-            os.environ["OLLAMA_BASE_URL"] = self.config_manager.get_model_endpoint()
+            os.environ["OLLAMA_BASE_URL"] = endpoint
             return OllamaLLM(
-                model=self.config_manager.get_model(),
-                base_url=self.config_manager.get_model_endpoint()
+                model=model_name,
+                base_url=endpoint
             )
         elif language_model == "openrouter":
             return ChatOpenAI(
-                model=self.config_manager.get_model(),
-                openai_api_key=self.config_manager.get_api_key(),
-                base_url=self.config_manager.get_model_endpoint(),
+                model=model_name,
+                openai_api_key=api_key,
+                base_url=endpoint,
                 default_headers={
                     "HTTP-Referer": "git-sage-cli",
                     "X-Title": "Git-Sage"
@@ -32,9 +37,9 @@ class AIProcessor:
             )
         elif language_model == "deepseek":
             return ChatOpenAI(
-                model=self.config_manager.get_model(),
-                openai_api_key=self.config_manager.get_api_key(),
-                base_url=self.config_manager.get_model_endpoint()
+                model=model_name,
+                openai_api_key=api_key,
+                base_url=endpoint
             )
         else:
             raise ValueError(f"Unsupported language model service: {language_model}")
@@ -45,10 +50,12 @@ class AIProcessor:
             prompt_template = ChatPromptTemplate.from_template("{input}")
             output_parser = StrOutputParser()
             chain = prompt_template | self.model | output_parser
+            
+            print("Calling language model...")
             response = chain.invoke({"input": prompt})
             return response
         except Exception as e:
-            raise Exception(f"Failed to call language model: {e}") from e
+            raise Exception(f"Failed to call language model: {str(e)}") from e
     
     def _parse_response(self, response: str) -> Dict[str, str]:
         """Parse AI response"""
@@ -170,7 +177,10 @@ Begin your analysis:"""
             analysis = self._parse_response(response)
             
             # Format commit message
-            return f"{analysis['type']}: {analysis['subject']}\n\n{analysis['body']}"
+            commit_message = f"{analysis['type']}: {analysis['subject']}\n\n{analysis['body']}"
+            print(f"\nGenerated commit message:\n{commit_message}")
+            
+            return commit_message
             
         except Exception as e:
-            raise Exception(f"Failed to process diff: {e}") from e
+            raise Exception(f"Failed to process diff: {str(e)}") from e
