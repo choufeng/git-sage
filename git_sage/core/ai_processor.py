@@ -69,15 +69,30 @@ class AIProcessor:
         try:
             language = self.config_manager.get_language()
             
-            prompt = f"""You are a commit message generator. Analyze the following git diff and generate a structured commit message in {language}. Focus only on describing the actual changes shown in the diff, not any potential follow-up actions.
+            prompt = f"""You are a professional code reviewer and commit message generator. Please carefully analyze the following git diff content and generate a structured commit message. Follow this thought process:
 
-Language mapping:
-- en: Generate the commit message in English
-- zh: Generate the commit message in Chinese (简体中文)
+1. Initial Understanding Phase
+- Quick overview of the entire diff to form a general impression
+- Identify main modified files and modules
+- Consider the potential purpose and impact of these changes
 
-The diff content is:
+2. Deep Analysis Phase
+- Detailed examination of each code change
+- Analyze technical characteristics of changes (new features, bug fixes, refactoring, etc.)
+- Consider the impact level of these changes on the system
+- Think about backward compatibility implications
 
-{diff_content}
+3. Multi-dimensional Evaluation
+- Functional Perspective: What new features are implemented or what issues are fixed?
+- Maintainability Perspective: Is code quality improved? Is technical debt addressed?
+- Compatibility Perspective: Are there any breaking changes?
+
+4. Verification and Summary
+- Double-check if all changes are correctly understood
+- Confirm if the chosen change type tag is most accurate
+- Verify if the description completely and accurately reflects the essence of changes
+
+Language requirement: {language} (en for English, zh for Chinese)
 
 Commit Tags Explanation:
 
@@ -101,10 +116,14 @@ No Version Update (NO-OP) Tags:
 - docs: For documentation changes only
 - chore: For other changes that don't affect the actual environment (code comments, non-package files, unit tests)
 
+The diff content is:
+
+{diff_content}
+
 You must respond in exactly this format:
 type: [choose the most appropriate tag from the above list]
 subject: [brief description, max 50 chars]
-body: [detailed explanation of the changes shown in the diff]
+body: [detailed explanation of the changes]
 
 Example of good format:
 type: docs
@@ -120,7 +139,7 @@ Remember:
 6. Do not include any installation steps or commands in the message
 7. Choose the most specific and appropriate tag for the changes
 
-Your response:"""
+Begin your analysis:"""
             
             # Call language model to get analysis result
             response = self._call_language_model(prompt)
