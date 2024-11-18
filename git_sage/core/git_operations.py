@@ -1,4 +1,5 @@
 import os
+import tempfile
 from typing import List, Tuple, Optional
 from git import Repo, GitCommandError
 
@@ -65,22 +66,55 @@ class GitOperations:
         """
         提交更改
         :param message: 提交信息
-        :param confirm: 是否需要确认
+        :param confirm: 是否需要编辑确认
         :return: 是否提交成功
         """
         try:
             if confirm:
-                print("\nCommit message:")
-                print("-" * 50)
-                print(message)
-                print("-" * 50)
-                response = input("\nDo you want to proceed with this commit? [y/N]: ")
-                if response.lower() != 'y':
-                    print("Commit cancelled.")
-                    return False
-            
-            self.repo.index.commit(message)
-            return True
+                # 创建临时文件来编辑提交信息
+                with tempfile.NamedTemporaryFile(mode='w+', suffix='.tmp', delete=False) as temp_file:
+                    temp_file.write(message)
+                    temp_file.write("\n\n# 请在上方编辑您的提交信息。")
+                    temp_file.write("\n# 保存并退出编辑器将执行提交操作。")
+                    temp_file.write("\n# 中断编辑将取消提交。")
+                    temp_file_path = temp_file.name
+
+                try:
+                    # 使用系统默认编辑器打开临时文件
+                    editor = os.environ.get('EDITOR', 'vim')
+                    exit_code = os.system(f'{editor} {temp_file_path}')
+                    
+                    if exit_code != 0:
+                        print("提交已取消。")
+                        return False
+
+                    # 读取编辑后的提交信息
+                    with open(temp_file_path, 'r') as temp_file:
+                        edited_message = ''
+                        for line in temp_file:
+                            if not line.startswith('#'):
+                                edited_message += line
+                        edited_message = edited_message.strip()
+
+                    if not edited_message:
+                        print("提交信息为空，提交已取消。")
+                        return False
+
+                    # 执行提交
+                    self.repo.index.commit(edited_message)
+                    return True
+
+                finally:
+                    # 清理临时文件
+                    try:
+                        os.unlink(temp_file_path)
+                    except:
+                        pass
+            else:
+                # 如果不需要确认，直接提交
+                self.repo.index.commit(message)
+                return True
+
         except Exception as e:
             raise Exception(f"Failed to commit: {e}") from e
     
