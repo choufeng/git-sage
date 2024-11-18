@@ -4,7 +4,7 @@ from typing import Dict, Optional
 
 class ConfigManager:
     DEFAULT_CONFIG = {
-        "language": "English",  # Default to English, but users can configure any language name
+        "language": "en",  # Default to English
         "language_model": "ollama",
         "model": "qwen2.5-coder:7b",
         "endpoint": "http://localhost:11434",

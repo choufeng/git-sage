@@ -4,17 +4,17 @@ import sys
 
 def main():
     """Initialize configuration command"""
-    print("\n=== Git Sage 初始配置 ===")
-    if click.confirm("是否现在进行配置？", default=True):
+    print("\n=== Git Sage Initial Setup ===")
+    if click.confirm("Would you like to configure Git Sage now?", default=True):
         try:
             subprocess.run(["gsg", "config", "-i"], check=True)
         except subprocess.CalledProcessError:
-            print("\n配置过程中出现错误。你可以稍后使用 'gsg config -i' 命令重新配置。")
+            print("\nAn error occurred during configuration. You can reconfigure using 'gsg config -i' later.")
         except Exception as e:
-            print(f"\n发生错误: {str(e)}")
-            print("你可以稍后使用 'gsg config -i' 命令进行配置。")
+            print(f"\nError occurred: {str(e)}")
+            print("You can configure Git Sage anytime using 'gsg config -i'.")
     else:
-        print("\n你可以随时使用 'gsg config -i' 命令进行配置。")
+        print("\nYou can configure Git Sage anytime using 'gsg config -i'.")
 
 if __name__ == '__main__':
     main()
