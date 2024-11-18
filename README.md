@@ -24,41 +24,27 @@ cd git-sage
 # Install
 pip install -e .
 
-# Run initial setup wizard
-gsg-setup
+# Configure Git Sage
+gsg set
 ```
 
 ## Configuration
 
-There are multiple ways to configure Git Sage:
-
-1. Run the initial setup wizard:
+Configure Git Sage settings:
 ```bash
-gsg-setup
-```
+# Set up configuration through interactive mode
+gsg set
 
-2. Use interactive configuration:
-```bash
-gsg config -i
-```
-
-3. Set individual configuration items:
-```bash
 # View current configuration
-gsg config
-
-# Set language (supports en/zh)
-gsg config --language zh
-
-# Set AI model
-gsg config --model ollama
-
-# Set API key
-gsg config --api-key your-key
-
-# Set model service endpoint
-gsg config --endpoint http://localhost:11434
+gsg show config
 ```
+
+The configuration wizard will guide you through setting up:
+- Response language
+- Language model service
+- Model name
+- Service endpoint
+- API key
 
 ## Usage
 
@@ -121,7 +107,7 @@ The configuration file is located at `~/.git-sage/config.yml` and contains the f
 - endpoint: Model service address (defaults to http://localhost:11434)
 - api_key: API key (defaults to ollama)
 
-All configuration items can be modified using `gsg config --<config-item> <value>` or through interactive configuration with `gsg config -i`.
+You can view current configuration using `gsg show config` and modify settings through `gsg set`.
 
 ## Dependencies
 
