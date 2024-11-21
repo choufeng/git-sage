@@ -160,7 +160,7 @@ gsg c
 
 - language: 提交信息语言 (默认为 en)
 - language_model: 选择使用的语言模型服务 (默认为 ollama)
-- model: 选择具体的模型名称 (默认为 codellama)
+- model: 选择具体的模型名称 (默认为 qwen2.5-coder:7b)
 - endpoint: 模型服务地址 (默认为 http://localhost:11434)
 - api_key: API 密钥 (默认为 ollama)
 

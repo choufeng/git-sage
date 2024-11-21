@@ -24,7 +24,7 @@ This error occurs when Git Sage attempts to use an Ollama model that hasn't been
    ```
 3. Try your Git Sage command again
 
-Note: Replace `<model-name>` with the specific model you're trying to use (e.g., llama2, codellama, etc.).
+Note: Replace `<model-name>` with the specific model you're trying to use (e.g., llama3.2, qwen2.5-coder, etc.).
 
 ### Failed to Process Diff Due to Connection Error
 

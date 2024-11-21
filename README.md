@@ -162,7 +162,7 @@ The configuration file is located at `~/.git-sage/config.yml` and contains the f
 
 - language: Commit message language (defaults to en)
 - language_model: Choose the language model service to use (defaults to ollama)
-- model: Choose the specific model name (defaults to codellama)
+- model: Choose the specific model name (defaults to qwen2.5-coder:7b)
 - endpoint: Model service address (defaults to http://localhost:11434)
 - api_key: API key (defaults to ollama)
 

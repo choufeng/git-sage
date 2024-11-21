@@ -84,7 +84,18 @@ class AIProcessor:
                 body_lines.append(line)
         
         if body_lines:
-            analysis['body'] = ' '.join(body_lines)
+            # 处理body部分，保持列表项的换行格式
+            formatted_body = []
+            for line in body_lines:
+                if line.startswith('- '):
+                    # 如果是列表项，确保前后有换行
+                    if formatted_body and not formatted_body[-1].endswith('\n'):
+                        formatted_body.append('\n')
+                    formatted_body.append(line + '\n')
+                else:
+                    formatted_body.append(line + ' ')
+            
+            analysis['body'] = ''.join(formatted_body).strip()
         
         # Set defaults if missing
         if 'type' not in analysis:
