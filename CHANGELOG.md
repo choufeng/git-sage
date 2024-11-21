@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.1.1 (2024-11-21)
+
+### Bug Fixes
+
+- Update model configuration and improve body formatting
+  ([`9edfe8a`](https://github.com/choufeng/git-sage/commit/9edfe8a72b51a80d80de16f1e0d2613f7667b74c))
+
+2. Improved the formatting of the body part in the `AIProcessor` class within `ai_processor.py`.
+  Specifically, it ensures that list items are properly formatted with consistent newlines before
+  and after them. These changes improve user experience by providing up-to-date information about
+  available models and enhance code readability by standardizing the formatting of the body text.
+  ```
+
+
 ## v0.1.0 (2024-11-19)
 
 ### Bug Fixes
@@ -32,6 +46,11 @@ Corrected the language support description from "多语言提交信息（包括�
   ([`4859a08`](https://github.com/choufeng/git-sage/commit/4859a08f471befa6342d2a9cb03bd96062375225))
 
 在 `GitOperations` 类中添加了编辑提交信息的功能，允许用户通过系统默认的文本编辑器来编辑提交消息，并且提供了明确的操作指南。
+
+### Chores
+
+- **release**: 0.1.0 [skip ci]
+  ([`d84fa95`](https://github.com/choufeng/git-sage/commit/d84fa95de923b0982d6e46a050994e6f4e6d1b04))
 
 ### Documentation
 
