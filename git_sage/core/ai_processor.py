@@ -119,9 +119,12 @@ For zh-CN: Use Simplified Chinese (简体中文) only
 For zh-TW: Use Traditional Chinese (繁體中文) only
 
 Your response format MUST be:
-type: [tag]
-subject: [brief description]
-body: [detailed explanation]
+type: tag
+subject: brief description
+body: detailed explanation
+    - bullet point 1
+    - bullet point 2
+    ...
 
 All text in the response (including type, subject, and body) MUST be in the specified language ({language}).
 """
