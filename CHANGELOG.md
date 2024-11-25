@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.1.2 (2024-11-25)
+
+### Bug Fixes
+
+- Corrected response format in ai_processor.py
+  ([`4977206`](https://github.com/choufeng/git-sage/commit/49772064f2ac32aedab07b387d693b55ed8542c5))
+
+- Fixed the response format to match the specified requirements. - Ensured that all text in the
+  response is in the specified language.
+
+
 ## v0.1.1 (2024-11-21)
 
 ### Bug Fixes
@@ -13,6 +24,11 @@
   and after them. These changes improve user experience by providing up-to-date information about
   available models and enhance code readability by standardizing the formatting of the body text.
   ```
+
+### Chores
+
+- **release**: 0.1.1 [skip ci]
+  ([`372220f`](https://github.com/choufeng/git-sage/commit/372220ff612d15404a991a9017ab17c073d9e6ee))
 
 
 ## v0.1.0 (2024-11-19)
