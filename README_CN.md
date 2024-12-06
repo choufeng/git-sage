@@ -21,14 +21,13 @@ git clone https://github.com/yourusername/git-sage.git
 # 进入项目目录
 cd git-sage
 
-# 创建并激活虚拟环境（推荐）
-python3 -m venv venv
-source venv/bin/activate  # Windows系统使用: venv\Scripts\activate
+# 安装 pipx（如果尚未安装）
+brew install pipx
 
-# 以开发模式安装
-pip install -e .
+# 使用 pipx 安装 Git Sage
+pipx install -e .
 
-# 配置Git Sage
+# 配置 Git Sage
 gsg set
 ```
 

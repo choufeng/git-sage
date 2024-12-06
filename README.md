@@ -23,12 +23,11 @@ git clone https://github.com/yourusername/git-sage.git
 # Navigate to project directory
 cd git-sage
 
-# Create and activate virtual environment (recommended)
-python3 -m venv venv
-source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+# Install pipx if you haven't already
+brew install pipx
 
-# Install in development mode
-pip install -e .
+# Install Git Sage using pipx
+pipx install -e .
 
 # Configure Git Sage
 gsg set
