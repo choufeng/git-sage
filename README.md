@@ -23,7 +23,11 @@ git clone https://github.com/yourusername/git-sage.git
 # Navigate to project directory
 cd git-sage
 
-# Install
+# Create and activate virtual environment (recommended)
+python3 -m venv venv
+source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+
+# Install in development mode
 pip install -e .
 
 # Configure Git Sage
