@@ -107,6 +107,31 @@ class AIProcessor:
             
         return analysis
     
+    def _clean_response(self, response: str) -> str:
+        """Clean the response by removing markdown code blocks and other formatting."""
+        # Remove markdown code block markers
+        response = response.replace('```json', '').replace('```', '').strip()
+        
+        # Remove any leading/trailing whitespace
+        response = response.strip()
+        
+        return response
+
+    def _ensure_json_response(self, prompt: str) -> str:
+        """Ensure the response is in valid JSON format."""
+        system_prompt = """你是一个代码审查助手。请直接返回JSON格式的响应，不要添加markdown格式。
+确保响应包含以下字段：
+- status: "PASS" 或 "FAIL"
+- issues: 问题列表，每个问题包含 file、line、rule 和 description
+- summary: 总体评估总结
+
+即使没有发现问题，也要返回完整的 JSON 结构。
+注意：请直接返回 JSON，不要添加 ```json 或其他格式标记。"""
+        
+        full_prompt = f"{system_prompt}\n\n{prompt}"
+        response = self._call_language_model(full_prompt)
+        return self._clean_response(response)
+
     def process_diff(self, diff_content: str) -> str:
         """Process git diff content and generate commit message"""
         try:
@@ -197,3 +222,20 @@ Remember: Your ENTIRE response MUST be in {language} language as specified above
             
         except Exception as e:
             raise Exception(f"Failed to process diff: {str(e)}") from e
+
+    def analyze_code(self, prompt: str, diff_content: str) -> str:
+        """
+        Analyze code changes using AI.
+        
+        Args:
+            prompt: The prompt containing rules and instructions
+            diff_content: The git diff content to analyze
+            
+        Returns:
+            str: JSON formatted analysis result
+        """
+        # Combine the prompt with the diff content
+        full_prompt = f"{prompt}\n\n这是要分析的代码变更：\n\n{diff_content}"
+        
+        # Get AI response using JSON-specific method
+        return self._ensure_json_response(full_prompt)
