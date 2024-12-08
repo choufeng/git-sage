@@ -4,6 +4,9 @@ from enum import Enum
 from git_sage.config.config_manager import ConfigManager
 from git_sage.core.git_operations import GitOperations
 from git_sage.core.ai_processor import AIProcessor
+from git_sage.core.code_validator import CodeValidator
+import os
+import sys
 
 class ResponseLanguage(str, Enum):
     ENGLISH = 'en'
@@ -51,6 +54,49 @@ def c(files):
         
     except Exception as e:
         click.echo(f"Error: {str(e)}", err=True)
+
+@cli.command()
+@click.argument('rule_type', required=False, default='common')
+@click.argument('files', nargs=-1)
+def v(rule_type, files):
+    """Verify staged changes against predefined rules. 
+    Optionally specify a rule type (e.g., 'c' for conventional commit rules)"""
+    try:
+        # Initialize modules
+        config_manager = ConfigManager()
+        git_ops = GitOperations()
+        ai_processor = AIProcessor(config_manager)
+        code_validator = CodeValidator(ai_processor, git_ops)
+        
+        # Check for staged changes
+        if not git_ops.has_staged_changes():
+            click.echo("No staged changes found. Please 'git add' some files first.")
+            return
+            
+        # Verify the prompt file exists
+        prompt_file = f"{rule_type}.txt"
+        prompt_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                'config', 'prompts', prompt_file)
+        
+        if not os.path.exists(prompt_path):
+            click.echo(f"Rule type '{rule_type}' not found. Please check available rules in the prompts directory.")
+            return
+            
+        # Run validation
+        click.echo(f"Verifying changes using rule type: {rule_type}")
+        result = code_validator.validate_changes(rule_type)
+        
+        # Display results
+        click.echo("\nValidation Results:")
+        click.echo(code_validator.format_validation_result(result))
+        
+        # Exit with appropriate status code
+        if result["status"] != "PASS":
+            sys.exit(1)
+        
+    except Exception as e:
+        click.echo(f"Error: {str(e)}", err=True)
+        sys.exit(1)
 
 @cli.command()
 def set():
