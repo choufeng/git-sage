@@ -1,6 +1,38 @@
 # CHANGELOG
 
 
+## v0.2.0 (2024-12-08)
+
+### Documentation
+
+- Update installation guide to use pipx instead of venv
+  ([`3673f6a`](https://github.com/choufeng/git-sage/commit/3673f6a3de815d8928d698736f979678272acb0f))
+
+Replace virtual environment setup with pipx installation in both README.md and README_CN.md for
+  better user experience and global command availability
+
+- Update installation instructions to include virtual environment setup
+  ([`9df88c3`](https://github.com/choufeng/git-sage/commit/9df88c39e85f09e2d703b895fe62254cd0b9ad51))
+
+- Added instructions for creating and activating a virtual environment before installation. -
+  Updated the installation command to specify development mode. - Changes applied to both English
+  (README.md) and Simplified Chinese (README_CN.md) versions of the documentation.
+
+### Features
+
+- Implement code validation feature with AI-driven analysis
+  ([`c7a22e1`](https://github.com/choufeng/git-sage/commit/c7a22e12caab6fa28f59e31a812c76a961311912))
+
+- Added a new CLI command `v` to verify staged changes against predefined rules. - Introduced a
+  `CodeValidator` class to handle the validation logic. - Enhanced the `AIProcessor` class to
+  support JSON-formatted responses and clean up AI responses. - Created new prompt files (`c.txt`
+  and `common.txt`) for different validation rules. - Updated `.gitignore` to include custom prompt
+  files and exclude non-common prompt files. - Implemented error handling and result formatting for
+  validation results. - Ensured backward compatibility by allowing the use of existing modules
+  (`ConfigManager`, `GitOperations`, `AIProcessor`). - Improved code maintainability by adding
+  comments and ensuring proper function documentation.
+
+
 ## v0.1.2 (2024-11-25)
 
 ### Bug Fixes
@@ -10,6 +42,11 @@
 
 - Fixed the response format to match the specified requirements. - Ensured that all text in the
   response is in the specified language.
+
+### Chores
+
+- **release**: 0.1.2 [skip ci]
+  ([`730fa58`](https://github.com/choufeng/git-sage/commit/730fa589787354fce2b9a473038121f53bea71f3))
 
 
 ## v0.1.1 (2024-11-21)
@@ -70,13 +107,6 @@ Corrected the language support description from "多语言提交信息（包括�
 
 ### Documentation
 
-- Remove interruption notice from commit template
-  ([`93b1636`](https://github.com/choufeng/git-sage/commit/93b16366bfe1588c4c925dd867250ac7f94db221))
-
-Remove the help text line that informed users about commit interruption behavior from the temporary
-  commit message template. This simplifies the commit message template while maintaining all
-  essential information for users.
-
 - Add connection error docs and improve formatting
   ([`845c2c7`](https://github.com/choufeng/git-sage/commit/845c2c737fe28454269f83a0f48ae50581852f1a))
 
@@ -90,17 +120,12 @@ Enhance error documentation by adding new section for connection errors. Improve
 Document various error messages, their causes, and solutions for using Git Sage with the Ollama
   model.
 
-- 更新代码注释和文档结构
-  ([`7b978ee`](https://github.com/choufeng/git-sage/commit/7b978ee65e968d55943b1d21072f5728678bb6ea))
+- Remove interruption notice from commit template
+  ([`93b1636`](https://github.com/choufeng/git-sage/commit/93b16366bfe1588c4c925dd867250ac7f94db221))
 
-添加语言映射说明、提交标签解释以及代码格式化。
-
-- Update README with project features and improve documentation structure.
-  ([`9c998ba`](https://github.com/choufeng/git-sage/commit/9c998ba6f0a276919c61cb90c1028503404514ea))
-
-Add detailed feature list and installation instructions. Include language support information. 1.
-  Keep the format exactly as shown 2. Use en for all text 3. Choose type from the given options 4.
-  Keep subject under 50 characters diff ```
+Remove the help text line that informed users about commit interruption behavior from the temporary
+  commit message template. This simplifies the commit message template while maintaining all
+  essential information for users.
 
 - Update commit message generation command description
   ([`31bc50e`](https://github.com/choufeng/git-sage/commit/31bc50e5a30cc36257b2fa16f1b1b8b417113b09))
@@ -112,15 +137,19 @@ Change default behavior of 'gsg' command to generate commit messages instead of 
 
 Update project documentation and improve clarity.
 
+- Update README with project features and improve documentation structure.
+  ([`9c998ba`](https://github.com/choufeng/git-sage/commit/9c998ba6f0a276919c61cb90c1028503404514ea))
+
+Add detailed feature list and installation instructions. Include language support information. 1.
+  Keep the format exactly as shown 2. Use en for all text 3. Choose type from the given options 4.
+  Keep subject under 50 characters diff ```
+
+- 更新代码注释和文档结构
+  ([`7b978ee`](https://github.com/choufeng/git-sage/commit/7b978ee65e968d55943b1d21072f5728678bb6ea))
+
+添加语言映射说明、提交标签解释以及代码格式化。
+
 ### Features
-
-- Add support for multiple AI platforms to Git Sage
-  ([`cc5292a`](https://github.com/choufeng/git-sage/commit/cc5292ae4075065e3e124383ca47c561ccd24469))
-
-Integrate support for Ollama, OpenRouter, and DeepSeek as new platforms for commit message
-  generation in Git Sage. Provide detailed instructions on setting up and configuring each platform,
-  including download links, installation steps, and configuration parameters. Update README files
-  with detailed platform information and usage examples.
 
 - Add DeepSeek model support and update CLI
   ([`2e2fb67`](https://github.com/choufeng/git-sage/commit/2e2fb67aff9dd88c6b041313bd50fe71620b0b83))
@@ -132,14 +161,6 @@ Integrate support for Ollama, OpenRouter, and DeepSeek as new platforms for comm
   endpoint and default configuration. - Enhanced the `AIProcessor` to include support for the
   DeepSeek model service.
 
-- Enhance config with multi-language and service options
-  ([`4437f85`](https://github.com/choufeng/git-sage/commit/4437f85d65a42514df1fd5b50d8d5773c3d27e75))
-
-Add support for multiple response languages including zh-CN, zh-TW, ja, and ko. Implement
-  interactive configuration using inquirer for better user experience. Add structured enums for
-  language and model service options. Enhance error handling with detailed traceback information.
-  Improve configuration interface with clear mappings and better user feedback.
-
 - Add OpenRouter AI service support
   ([`5fffee5`](https://github.com/choufeng/git-sage/commit/5fffee5eea4bba2e07e789bfdc81774e95a13633))
 
@@ -150,15 +171,31 @@ Extend AI processor to support multiple language model services. Add OpenRouter/
   OpenRouter - Maintain backward compatibility with existing Ollama implementation - Improve type
   hints with Union type for model instances
 
-- 添加初始配置向导功能
-  ([`5cb22bb`](https://github.com/choufeng/git-sage/commit/5cb22bb905c9bb01c36bacdf9a2da817750e6ee5))
+- Add support for multiple AI platforms to Git Sage
+  ([`cc5292a`](https://github.com/choufeng/git-sage/commit/cc5292ae4075065e3e124383ca47c561ccd24469))
 
-为Git Sage添加了一个交互式配置向导，可以通过 `gsg-setup` 命令运行。同时，更新了README文件以反映这一新功能。
+Integrate support for Ollama, OpenRouter, and DeepSeek as new platforms for commit message
+  generation in Git Sage. Provide detailed instructions on setting up and configuring each platform,
+  including download links, installation steps, and configuration parameters. Update README files
+  with detailed platform information and usage examples.
+
+- Enhance config with multi-language and service options
+  ([`4437f85`](https://github.com/choufeng/git-sage/commit/4437f85d65a42514df1fd5b50d8d5773c3d27e75))
+
+Add support for multiple response languages including zh-CN, zh-TW, ja, and ko. Implement
+  interactive configuration using inquirer for better user experience. Add structured enums for
+  language and model service options. Enhance error handling with detailed traceback information.
+  Improve configuration interface with clear mappings and better user feedback.
 
 - 增加交互式配置模式
   ([`7b8a3d9`](https://github.com/choufeng/git-sage/commit/7b8a3d9eac2d571852a31b1f9b7b1de6a97567ee))
 
 为 `git_sage/cli/main.py` 添加了交互式配置模式选项 `-i`，使得用户可以通过命令行进行配置的交互式设置。此外，更新了相关文件以支持此新功能，并调整了默认模型名称。
+
+- 完善配置文件
+  ([`f490b80`](https://github.com/choufeng/git-sage/commit/f490b8071825d127681bcf5919d32c26430b7525))
+
+根据用户需求添加了`language`, `language_model`, `model`, `endpoint`, 和 `api_key`配置项，并更新了配置管理器以支持这些新配置。
 
 - 支持多语言返回
   ([`f7e5504`](https://github.com/choufeng/git-sage/commit/f7e55045d556e37b5e2abe6e8fa245402930cccd))
@@ -166,12 +203,18 @@ Extend AI processor to support multiple language model services. Add OpenRouter/
 - 新增提交规范
   ([`cd8ec64`](https://github.com/choufeng/git-sage/commit/cd8ec647b7711851a8bcbdd52ff34dd2f203dee6))
 
-- 完善配置文件
-  ([`f490b80`](https://github.com/choufeng/git-sage/commit/f490b8071825d127681bcf5919d32c26430b7525))
+- 添加初始配置向导功能
+  ([`5cb22bb`](https://github.com/choufeng/git-sage/commit/5cb22bb905c9bb01c36bacdf9a2da817750e6ee5))
 
-根据用户需求添加了`language`, `language_model`, `model`, `endpoint`, 和 `api_key`配置项，并更新了配置管理器以支持这些新配置。
+为Git Sage添加了一个交互式配置向导，可以通过 `gsg-setup` 命令运行。同时，更新了README文件以反映这一新功能。
 
 ### Refactoring
+
+- Refactor commit message handling
+  ([`0ecc260`](https://github.com/choufeng/git-sage/commit/0ecc260672814a9835495c3dba1198a18fe2da9b))
+
+Improved commit message handling by adding a confirmation step before committing. This ensures that
+  users have the opportunity to review and confirm their commit messages before finalizing them.
 
 - Update AIProcessor to use environment variables for Ollama model endpoint
   ([`7c85905`](https://github.com/choufeng/git-sage/commit/7c859053ba97dc26de0c2d5377bb0584663352be))
@@ -179,12 +222,6 @@ Extend AI processor to support multiple language model services. Add OpenRouter/
 Added an environmental variable OLLAMA_BASE_URL to set the base URL for the Ollama language model,
   removing direct model endpoint access from code. This refactors the initialization process of
   AIProcessor to utilize this variable, improving maintainability and security.
-
-- Refactor commit message handling
-  ([`0ecc260`](https://github.com/choufeng/git-sage/commit/0ecc260672814a9835495c3dba1198a18fe2da9b))
-
-Improved commit message handling by adding a confirmation step before committing. This ensures that
-  users have the opportunity to review and confirm their commit messages before finalizing them.
 
 - Update README to support multilingual commit messages
   ([`8d522ef`](https://github.com/choufeng/git-sage/commit/8d522ef5e2e5b851522e94a498749f4bf54ca6f1))
