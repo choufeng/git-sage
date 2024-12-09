@@ -1,7 +1,41 @@
 # CHANGELOG
 
 
+## v0.3.0 (2024-12-09)
+
+### Features
+
+- Add get_response method to AIProcessor class
+  ([`3925de4`](https://github.com/choufeng/git-sage/commit/3925de43ddc0a92980866ad2f1dff1fa62d4f615))
+
+- Introduced a new method `get_response` in the `AIProcessor` class to handle direct calls to the
+  language model. - The `get_response` method encapsulates the call to `_call_language_model` and
+  includes error handling to raise a more informative exception if the call fails. - This
+  enhancement improves the usability and robustness of the `AIProcessor` class by providing a clear
+  interface for obtaining responses from the language model. - No breaking changes are introduced,
+  ensuring backward compatibility.
+
+- Implement code review feature and prompt initialization
+  ([`09df126`](https://github.com/choufeng/git-sage/commit/09df126f084314329c62cc84c5612a5c26db9a42))
+
+- Added a new CLI command `cr` to perform code review between the current branch and the main
+  branch. - Implemented the `cr` command to check for code changes, load prompt files, and validate
+  changes using AI analysis. - Introduced a new CLI command `init_prompts` to initialize default
+  prompt files in the user's directory. - Enhanced the `CodeValidator` class to support loading
+  prompts from both user and config directories, improving flexibility. - Added new methods in the
+  `GitOperations` class to check if the current directory is a git repository and to get the diff
+  between the current branch and the main branch. - Created new prompt files (`ccr.txt`) and added
+  them to the prompts directory for use in code review. - Added TypeScript files for handling code
+  review commands and utility functions. - Improved error handling and logging in the code review
+  process.
+
+
 ## v0.2.0 (2024-12-08)
+
+### Chores
+
+- **release**: 0.2.0 [skip ci]
+  ([`d6d81ce`](https://github.com/choufeng/git-sage/commit/d6d81ceac6250ed5bf76663ffe97ee1b071f35f9))
 
 ### Documentation
 
