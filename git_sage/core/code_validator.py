@@ -1,102 +1,84 @@
 import os
 import json
 from typing import Dict, List, Optional, Union
+from ..config.config_manager import ConfigManager
+from .ai_processor import AIProcessor
+from .git_operations import GitOperations
 
 class CodeValidator:
-    def __init__(self, ai_processor, git_ops):
+    def __init__(self, ai_processor: AIProcessor, git_ops: GitOperations):
         """Initialize the code validator with necessary dependencies."""
         self.ai_processor = ai_processor
         self.git_ops = git_ops
-        self.prompts_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', 'prompts')
+        self.config_prompts_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', 'prompts')
+        self.user_prompts_dir = os.path.expanduser('~/.git-sage/prompts')
 
-    def _load_prompt(self, prompt_file: str) -> str:
-        """Load a prompt file from the prompts directory."""
-        with open(os.path.join(self.prompts_dir, prompt_file), 'r') as f:
-            return f.read()
-
-    def _combine_prompts(self, rule_type: str) -> str:
-        """Combine common rules with specific rule type."""
-        common_prompt = self._load_prompt('common.txt')
-        if rule_type == 'common':
-            return common_prompt
-            
-        specific_prompt = self._load_prompt(f'{rule_type}.txt')
-        return f"{common_prompt}\n\nAdditionally, apply these specific rules:\n\n{specific_prompt}"
-
-    def validate_changes(self, rule_type: str) -> Dict[str, Union[str, List[Dict[str, str]]]]:
-        """
-        Validate the staged changes against specified rules.
-        
-        Args:
-            rule_type: Type of rules to apply (e.g., 'c' for conventional commit rules)
-            
-        Returns:
-            Dict containing validation results with status, issues, and summary
-        """
-        try:
-            # Get the diff of staged changes
-            diff_content = self.git_ops.get_staged_diff()
-            if not diff_content:
-                return {
-                    "status": "FAIL",
-                    "issues": [],
-                    "summary": "No changes to analyze"
-                }
-
-            # Load and combine prompts
-            prompt = self._combine_prompts(rule_type)
-            
-            # Get AI analysis of the changes
-            analysis = self.ai_processor.analyze_code(prompt, diff_content)
-            
-            # Debug: Print the raw AI response
-            print("\nDebug - Raw AI response:")
-            print(analysis)
-            print("\n" + "="*50 + "\n")
-            
-            # Parse the AI response
+    def _load_prompt(self, prompt_name: str) -> Optional[str]:
+        """Load prompt from user directory first, then fall back to config directory"""
+        # Try user directory first
+        user_prompt_path = os.path.join(self.user_prompts_dir, f'{prompt_name}.txt')
+        if os.path.exists(user_prompt_path):
             try:
-                result = json.loads(analysis)
-                # Ensure the response has the required fields
-                required_fields = ['status', 'issues', 'summary']
-                if not all(field in result for field in required_fields):
-                    raise ValueError("AI response missing required fields")
-                return result
-            except json.JSONDecodeError as e:
-                print(f"\nDebug - JSON parse error: {str(e)}")
-                return {
-                    "status": "ERROR",
-                    "issues": [],
-                    "summary": "Failed to parse AI response"
-                }
-
+                with open(user_prompt_path, 'r', encoding='utf-8') as f:
+                    return f.read().strip()
+            except Exception:
+                pass
+                
+        # Fall back to config directory
+        config_prompt_path = os.path.join(self.config_prompts_dir, f'{prompt_name}.txt')
+        if os.path.exists(config_prompt_path):
+            try:
+                with open(config_prompt_path, 'r', encoding='utf-8') as f:
+                    return f.read().strip()
+            except Exception:
+                pass
+                
+        return None
+        
+    def validate_changes(self, prompt_type: str) -> Dict:
+        """Validate changes using specified prompt type"""
+        # Load prompts
+        common_prompt = self._load_prompt('common')
+        specific_prompt = self._load_prompt(prompt_type)
+        
+        if not common_prompt or not specific_prompt:
+            return {
+                "status": "ERROR",
+                "message": f"无法加载 prompt 文件。请确保以下文件存在：\n"
+                          f"1. {self.user_prompts_dir}/common.txt 或 {self.config_prompts_dir}/common.txt\n"
+                          f"2. {self.user_prompts_dir}/{prompt_type}.txt 或 {self.config_prompts_dir}/{prompt_type}.txt"
+            }
+            
+        # Get diff
+        diff = self.git_ops.get_branch_diff()
+        if not diff:
+            return {
+                "status": "ERROR",
+                "message": "没有发现代码变更，请确保：\n1. 当前分支有提交的改动\n2. 当前分支与主分支有差异"
+            }
+            
+        # Combine prompts
+        full_prompt = f"{common_prompt}\n{specific_prompt}\n\n以下是代码变更：\n{diff}"
+        
+        # Get AI feedback
+        try:
+            response = self.ai_processor.get_response(full_prompt)
+            return {
+                "status": "PASS" if "符合规范" in response or "质量良好" in response else "FAIL",
+                "message": response
+            }
         except Exception as e:
             return {
                 "status": "ERROR",
-                "issues": [],
-                "summary": f"Error during validation: {str(e)}"
+                "message": f"获取 AI 反馈失败：{str(e)}"
             }
-
-    def format_validation_result(self, result: Dict[str, Union[str, List[Dict[str, str]]]]) -> str:
-        """Format the validation result for display in Chinese."""
-        output = []
-        
-        if result["status"] == "PASS":
-            output.append("✅ 验证通过！所有检查都符合规范。")
-        elif result["status"] == "ERROR":
-            output.append(f"❌ 验证过程中出现错误：{result['summary']}")
-        else:
-            output.append("❌ 发现以下问题：")
             
-        if result.get("issues"):
-            for issue in result["issues"]:
-                file_info = f"{issue['file']}:{issue.get('line', 'N/A')}"
-                output.append(f"\n• 位置：{file_info}")
-                output.append(f"  规则：{issue['rule']}")
-                output.append(f"  描述：{issue['description']}")
-        elif result["status"] == "FAIL":
-            output.append("  未能获取具体问题详情，请检查验证器配置。")
+    def format_validation_result(self, result: Dict) -> str:
+        """Format validation result for display"""
+        status_map = {
+            "PASS": "✅ 通过",
+            "FAIL": "❌ 未通过",
+            "ERROR": "⚠️ 错误"
+        }
         
-        output.append(f"\n总结：{result['summary']}")
-        
-        return "\n".join(output)
+        return f"{status_map.get(result['status'], '❓ 未知')}\n\n{result['message']}"
