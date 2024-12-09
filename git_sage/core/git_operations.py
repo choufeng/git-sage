@@ -129,3 +129,28 @@ class GitOperations:
             return len(staged_files) > 0
         except Exception as e:
             raise Exception(f"Failed to check staged changes: {e}") from e
+
+    def is_git_repository(self) -> bool:
+        """Check if current directory is a git repository"""
+        try:
+            self.repo.git.rev_parse('--is-inside-work-tree')
+            return True
+        except GitCommandError:
+            return False
+            
+    def get_main_branch_name(self) -> str:
+        """Get the name of the main branch"""
+        try:
+            remote_head = self.repo.git.symbolic_ref('refs/remotes/origin/HEAD')
+            return remote_head.split('/')[-1]
+        except GitCommandError:
+            return 'main'
+            
+    def get_branch_diff(self) -> Optional[str]:
+        """Get diff between current branch and main branch"""
+        try:
+            main_branch = self.get_main_branch_name()
+            return self.repo.git.diff(f'{main_branch}...HEAD')
+        except GitCommandError as e:
+            print(f"Warning: Failed to get branch diff: {e}")
+            return None

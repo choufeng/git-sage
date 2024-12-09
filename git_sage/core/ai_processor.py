@@ -132,6 +132,13 @@ class AIProcessor:
         response = self._call_language_model(full_prompt)
         return self._clean_response(response)
 
+    def get_response(self, prompt: str) -> str:
+        """Get response from language model"""
+        try:
+            return self._call_language_model(prompt)
+        except Exception as e:
+            raise Exception(f"Failed to get response: {str(e)}") from e
+
     def process_diff(self, diff_content: str) -> str:
         """Process git diff content and generate commit message"""
         try:
