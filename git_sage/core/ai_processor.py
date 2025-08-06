@@ -186,6 +186,17 @@ You are a professional code reviewer and commit message generator. Please carefu
 - Confirm if the chosen change type tag is most accurate
 - Verify if the description completely and accurately reflects the essence of changes
 
+IMPORTANT WRITING STYLE:
+Write commit messages in an active, direct style. Avoid self-referential phrases like "this commit", "this change", "this update", "this modification". Instead, describe what the change does directly using imperative mood.
+
+Examples:
+- Bad: "This commit adds user authentication"
+- Good: "Add user authentication"
+- Bad: "This change fixes a bug in user login" 
+- Good: "Fix user login validation issue"
+- Bad: "This update improves performance"
+- Good: "Improve database query performance"
+
 Commit Tags Explanation:
 
 Patch Version (PATCH) Tags:
