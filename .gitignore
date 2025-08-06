@@ -69,4 +69,4 @@ Thumbs.db
 
 # Custom prompt rules
 git_sage/config/prompts/*.txt
-!git_sage/config/prompts/common.txt
+git_sage/config/prompts/common.txt
