@@ -1,6 +1,8 @@
 import os
 import tempfile
-from typing import List, Tuple, Optional
+import subprocess
+import re
+from typing import List, Tuple, Optional, Dict
 from git import Repo, GitCommandError
 
 class GitOperations:
@@ -138,13 +140,52 @@ class GitOperations:
         except GitCommandError:
             return False
             
+    def _branch_exists(self, branch_name: str) -> bool:
+        """Check if branch exists locally or remotely"""
+        try:
+            # Check if remote branch exists
+            remote_branches = [ref.name for ref in self.repo.remote('origin').refs]
+            if f'origin/{branch_name}' in remote_branches:
+                return True
+            
+            # Check if local branch exists
+            local_branches = [ref.name for ref in self.repo.heads]
+            if branch_name in local_branches:
+                return True
+                
+            return False
+        except Exception:
+            # If we can't check, assume it might exist
+            return True
+    
     def get_main_branch_name(self) -> str:
-        """Get the name of the main branch"""
+        """Get the name of the main branch using multiple detection strategies"""
+        print("检测主分支名称...")
+        
+        # Strategy 1: Check remote HEAD
         try:
             remote_head = self.repo.git.symbolic_ref('refs/remotes/origin/HEAD')
-            return remote_head.split('/')[-1]
+            branch_name = remote_head.split('/')[-1]
+            if self._branch_exists(branch_name):
+                print(f"从远程 HEAD 检测到主分支: {branch_name}")
+                return branch_name
+            else:
+                print(f"远程 HEAD 指向的分支 '{branch_name}' 不存在")
         except GitCommandError:
-            return 'main'
+            print("无法从远程 HEAD 获取主分支信息")
+        
+        # Strategy 2: Check common main branch names
+        common_branches = ['main', 'master', 'develop']
+        print(f"检查常见主分支名称: {common_branches}")
+        
+        for branch in common_branches:
+            if self._branch_exists(branch):
+                print(f"找到存在的主分支: {branch}")
+                return branch
+        
+        # Strategy 3: Fallback - use 'main' as default
+        print("使用默认主分支名称: main")
+        return 'main'
             
     def get_branch_diff(self) -> Optional[str]:
         """Get diff between current branch and main branch"""
@@ -153,4 +194,79 @@ class GitOperations:
             return self.repo.git.diff(f'{main_branch}...HEAD')
         except GitCommandError as e:
             print(f"Warning: Failed to get branch diff: {e}")
+            return None
+    
+    def get_current_branch(self) -> str:
+        """Get current branch name"""
+        try:
+            return self.repo.active_branch.name
+        except Exception as e:
+            raise Exception(f"Failed to get current branch: {e}") from e
+    
+    def get_branch_commits(self) -> List[Dict[str, str]]:
+        """Get commits in current branch that are not in main branch"""
+        try:
+            main_branch = self.get_main_branch_name()
+            current_branch = self.get_current_branch()
+            
+            # Get commits that are in current branch but not in main branch
+            commits = list(self.repo.iter_commits(f'{main_branch}..{current_branch}'))
+            
+            commit_list = []
+            for commit in commits:
+                commit_list.append({
+                    'hash': commit.hexsha[:7],
+                    'message': commit.message.strip(),
+                    'author': str(commit.author),
+                    'date': commit.committed_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                })
+            
+            return commit_list
+        except Exception as e:
+            raise Exception(f"Failed to get branch commits: {e}") from e
+    
+    def extract_ticket_from_branch(self) -> Optional[str]:
+        """Extract ticket number from branch name"""
+        try:
+            branch_name = self.get_current_branch()
+            
+            # Pattern to match ticket numbers like IM-2312, JIRA-123, etc.
+            pattern = r'([A-Z]+-\d+)'
+            match = re.search(pattern, branch_name)
+            
+            if match:
+                return match.group(1)
+            return None
+        except Exception as e:
+            print(f"Warning: Failed to extract ticket from branch: {e}")
+            return None
+    
+    def has_github_cli(self) -> bool:
+        """Check if GitHub CLI (gh) is installed"""
+        try:
+            subprocess.run(['gh', '--version'], 
+                         capture_output=True, check=True)
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return False
+    
+    def push_branch(self) -> bool:
+        """Push current branch to remote"""
+        try:
+            current_branch = self.get_current_branch()
+            origin = self.repo.remote('origin')
+            
+            # Push current branch to origin
+            origin.push(current_branch)
+            return True
+        except Exception as e:
+            print(f"Failed to push branch: {e}")
+            return False
+    
+    def get_remote_url(self) -> Optional[str]:
+        """Get remote origin URL"""
+        try:
+            return self.repo.remote('origin').url
+        except Exception as e:
+            print(f"Warning: Failed to get remote URL: {e}")
             return None
