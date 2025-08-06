@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, List
 from langchain_ollama import OllamaLLM
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -257,3 +257,183 @@ Remember: Your ENTIRE response MUST be in {language} language as specified above
         
         # Get AI response using JSON-specific method
         return self._ensure_json_response(full_prompt)
+    
+    def generate_pr_content(self, commits: List[Dict[str, str]], diff_content: str, ticket: str = None) -> Dict[str, str]:
+        """
+        Generate PR title and description based on commits and diff content
+        
+        Args:
+            commits: List of commit information dictionaries
+            diff_content: The git diff content between current branch and main branch
+            ticket: Optional ticket number extracted from branch name
+            
+        Returns:
+            Dict with 'title' and 'description' keys
+        """
+        try:
+            language = self.config_manager.get_language()
+            
+            # Build commit summary
+            commit_summary = ""
+            if commits:
+                commit_summary = "\n".join([f"- {commit['hash']}: {commit['message']}" for commit in commits])
+            
+            # Build system instruction
+            system_instruction = f"""IMPORTANT: You MUST respond in {language} language.
+For en: Use English only
+For zh-CN: Use Simplified Chinese (简体中文) only
+For zh-TW: Use Traditional Chinese (繁體中文) only
+
+Your response format MUST be:
+title: PR_TITLE
+description: PR_DESCRIPTION
+
+All text in the response MUST be in the specified language ({language}).
+"""
+            
+            prompt = f"""{system_instruction}
+
+You are a professional software developer creating a Pull Request. Please analyze the following information and generate an appropriate PR title and description.
+
+IMPORTANT: Follow these strict formatting rules for the PR title:
+- Format: {{TYPE}}:[{{TICKET}}] {{DESCRIPTION}}
+- TYPE should be one of: Feat, Fix, Update, Breaking, Docs, Chore, Test, Build, Refactor
+- TICKET: Use the provided ticket number if available
+- DESCRIPTION: Brief, clear description of the change
+
+PR Description Requirements (MUST follow this exact three-section structure):
+
+### Description
+{{Brief summary of what this PR does (1-2 sentences)}}
+- {{Detailed technical change 1}}
+- {{Detailed technical change 2}}
+- {{Detailed technical change 3}}
+- {{Detailed technical change 4 (if needed)}}
+- {{Detailed technical change 5 (if needed)}}
+
+### Related issues or context
+- https://compass-tech.atlassian.net/browse/{{TICKET}}
+
+### QA
+{{Based on code changes, determine:}}
+- If there are UI changes or user-visible functionality changes: [QA: Verify] + provide simple verification steps
+- If no UI changes (backend logic, refactoring, config, etc.): [QA: None]
+
+QA Decision Rules:
+- UI components, pages, styles, user interactions → [QA: Verify]
+- API endpoints affecting frontend → [QA: Verify]  
+- Pure backend logic, database changes, refactoring, config → [QA: None]
+- Tests, docs, build scripts → [QA: None]
+
+Analysis Steps:
+1. Read branch commit messages to understand development intent
+2. Analyze code diff to confirm actual changes and impact scope
+3. Determine the most appropriate PR type
+4. Decide QA section based on whether changes are user-visible
+5. Generate description following the three-section structure
+
+Branch Commits Information:
+{commit_summary if commit_summary else "No commits found"}
+
+Ticket Number: {ticket if ticket else "No ticket found"}
+
+Code Diff Content:
+{diff_content if diff_content else "No diff content available"}
+
+Remember: Your ENTIRE response MUST be in {language} language as specified above.
+IMPORTANT: You MUST follow the exact three-section format shown above.
+"""
+            
+            # Call language model
+            response = self._call_language_model(prompt)
+            
+            # Parse response to extract title and description
+            lines = response.strip().split('\n')
+            result = {'title': '', 'description': ''}
+            
+            # Find title
+            for line in lines:
+                if line.strip().lower().startswith('title:'):
+                    result['title'] = line.strip()[6:].strip()
+                    break
+            
+            # Extract description (everything after title line)
+            description_lines = []
+            title_found = False
+            
+            for line in lines:
+                if line.strip().lower().startswith('title:'):
+                    title_found = True
+                    continue
+                
+                if title_found:
+                    # Skip empty lines at the beginning
+                    if not description_lines and not line.strip():
+                        continue
+                    description_lines.append(line)
+            
+            # Process description to handle the three-section format
+            description_content = '\n'.join(description_lines).strip()
+            
+            # If the response doesn't start with ### Description, add it
+            if description_content and not description_content.startswith('###'):
+                # Try to find where the actual description content starts
+                if 'description:' in description_content.lower():
+                    # Remove "description:" prefix if present
+                    desc_start = description_content.lower().find('description:')
+                    description_content = description_content[desc_start + 12:].strip()
+            
+            result['description'] = description_content
+            
+            # Set defaults if missing
+            if not result['title']:
+                pr_type = self._determine_pr_type(commits, diff_content)
+                ticket_part = f"[{ticket}] " if ticket else ""
+                result['title'] = f"{pr_type}:{ticket_part}Update codebase"
+            
+            if not result['description']:
+                # Generate default three-section description
+                ticket_link = f"- https://compass-tech.atlassian.net/browse/{ticket}" if ticket else "- No related ticket"
+                result['description'] = f"""### Description
+Update codebase with latest changes.
+- Implement code improvements and modifications
+- Update existing functionality
+
+### Related issues or context
+{ticket_link}
+
+### QA
+[QA: None]"""
+            
+            return result
+            
+        except Exception as e:
+            raise Exception(f"Failed to generate PR content: {str(e)}") from e
+    
+    def _determine_pr_type(self, commits: List[Dict[str, str]], diff_content: str) -> str:
+        """Determine PR type based on commits and diff content"""
+        if not commits and not diff_content:
+            return "Chore"
+        
+        # Check commit messages for common patterns
+        if commits:
+            commit_text = ' '.join([commit['message'].lower() for commit in commits])
+            if 'feat' in commit_text or 'feature' in commit_text or 'add' in commit_text:
+                return "Feat"
+            elif 'fix' in commit_text or 'bug' in commit_text:
+                return "Fix"
+            elif 'update' in commit_text or 'improve' in commit_text:
+                return "Update"
+            elif 'break' in commit_text or 'breaking' in commit_text:
+                return "Breaking"
+            elif 'doc' in commit_text or 'readme' in commit_text:
+                return "Docs"
+            elif 'test' in commit_text:
+                return "Test"
+            elif 'build' in commit_text or 'config' in commit_text:
+                return "Build"
+            elif 'refactor' in commit_text:
+                return "Refactor"
+        
+        # Default to Update if can't determine
+        return "Update"

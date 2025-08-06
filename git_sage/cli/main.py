@@ -1,5 +1,6 @@
 import click
 import inquirer
+import subprocess
 from enum import Enum
 from git_sage.config.config_manager import ConfigManager
 from git_sage.core.git_operations import GitOperations
@@ -305,6 +306,112 @@ def init_prompts():
         
     except Exception as e:
         click.echo(f"Error: {str(e)}", err=True)
+        sys.exit(1)
+
+@cli.command()
+@click.option('--dry-run', '-n', is_flag=True, help='仅显示PR信息，不创建')
+def pr(dry_run):
+    """生成并创建 Pull Request"""
+    try:
+        # Initialize modules
+        config_manager = ConfigManager()
+        git_ops = GitOperations()
+        ai_processor = AIProcessor(config_manager)
+        
+        # Check if in git repository
+        if not git_ops.is_git_repository():
+            click.echo("错误：当前目录不是 git 仓库")
+            sys.exit(1)
+        
+        # Get current branch
+        current_branch = git_ops.get_current_branch()
+        main_branch = git_ops.get_main_branch_name()
+        
+        # Check if on main branch
+        if current_branch == main_branch:
+            click.echo(f"错误：当前在主分支 '{main_branch}' 上，无法创建 PR")
+            sys.exit(1)
+        
+        # Get branch commits and diff
+        click.echo(f"正在分析分支 '{current_branch}' 的变更...")
+        commits = git_ops.get_branch_commits()
+        diff_content = git_ops.get_branch_diff()
+        
+        if not commits and not diff_content:
+            click.echo("没有发现与主分支的差异，无法创建 PR")
+            return
+        
+        # Extract ticket number from branch name
+        ticket = git_ops.extract_ticket_from_branch()
+        
+        # Generate PR content using AI
+        click.echo("正在生成 PR 内容...")
+        pr_content = ai_processor.generate_pr_content(commits, diff_content, ticket)
+        
+        # Display PR information
+        click.echo("\n" + "="*50)
+        click.echo("生成的 PR 信息：")
+        click.echo("="*50)
+        click.echo(f"标题: {pr_content['title']}")
+        click.echo(f"\n描述:\n{pr_content['description']}")
+        click.echo("="*50)
+        
+        if dry_run:
+            click.echo("\n--dry-run 模式：仅显示信息，不创建 PR")
+            return
+        
+        # Check if GitHub CLI is available
+        if git_ops.has_github_cli():
+            # Ask user if they want to create PR
+            create_pr = click.confirm("\n是否创建 Pull Request?", default=True)
+            
+            if create_pr:
+                # Check if branch is pushed to remote
+                try:
+                    click.echo("检查分支状态...")
+                    # Try to get remote tracking branch
+                    remote_branch = git_ops.repo.active_branch.tracking_branch()
+                    if not remote_branch:
+                        click.echo("分支尚未推送到远程，正在推送...")
+                        if not git_ops.push_branch():
+                            click.echo("推送分支失败")
+                            sys.exit(1)
+                        click.echo("分支推送成功")
+                except:
+                    # If tracking branch doesn't exist, push the branch
+                    click.echo("分支尚未推送到远程，正在推送...")
+                    if not git_ops.push_branch():
+                        click.echo("推送分支失败")
+                        sys.exit(1)
+                    click.echo("分支推送成功")
+                
+                # Create PR using GitHub CLI
+                try:
+                    click.echo("正在创建 Pull Request...")
+                    cmd = [
+                        'gh', 'pr', 'create',
+                        '--title', pr_content['title'],
+                        '--body', pr_content['description']
+                    ]
+                    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                    click.echo("Pull Request 创建成功！")
+                    click.echo(f"PR URL: {result.stdout.strip()}")
+                except subprocess.CalledProcessError as e:
+                    click.echo(f"创建 PR 失败: {e.stderr}")
+                    sys.exit(1)
+            else:
+                click.echo("PR 创建已取消")
+        else:
+            click.echo("\n未检测到 GitHub CLI (gh)，无法自动创建 PR")
+            click.echo("请手动创建 PR，或安装 GitHub CLI: https://cli.github.com/")
+            click.echo(f"\n当前分支: {current_branch}")
+            click.echo(f"目标分支: {main_branch}")
+            remote_url = git_ops.get_remote_url()
+            if remote_url:
+                click.echo(f"远程仓库: {remote_url}")
+    
+    except Exception as e:
+        click.echo(f"错误: {str(e)}", err=True)
         sys.exit(1)
 
 if __name__ == '__main__':
