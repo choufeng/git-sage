@@ -93,7 +93,7 @@ Git Sage supports multiple AI platforms to power its commit message generation. 
   gsg set
   # Set language_model to: gemini
   # Set endpoint to: https://generativelanguage.googleapis.com/v1beta
-  # Set model to: gemini-pro
+  # Set model to: gemini-2.5-flash
   # Set your API key when prompted
   ```
 
@@ -106,7 +106,7 @@ Git Sage supports multiple AI platforms to power its commit message generation. 
   gsg set
   # Set language_model to: modelscope
   # Set endpoint to: https://api-inference.modelscope.cn/v1/chat/completions
-  # Set model to: qwen/Qwen2.5-Coder-32B-Instruct
+  # Set model to: Qwen/Qwen3-Coder-480B-A35B-Instruct
   # Set your API key when prompted
   ```
 

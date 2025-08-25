@@ -91,7 +91,7 @@ Git Sage 支持多个 AI 平台来驱动其提交信息生成功能。以下是�
   gsg set
   # 将language_model设置为：gemini
   # 将endpoint设置为：https://generativelanguage.googleapis.com/v1beta
-  # 将model设置为：gemini-pro
+  # 将model设置为：gemini-2.5-flash
   # 在提示时输入你的API密钥
   ```
 
@@ -104,7 +104,7 @@ Git Sage 支持多个 AI 平台来驱动其提交信息生成功能。以下是�
   gsg set
   # 将language_model设置为：modelscope
   # 将endpoint设置为：https://api-inference.modelscope.cn/v1/chat/completions
-  # 将model设置为：qwen/Qwen2.5-Coder-32B-Instruct
+  # 将model设置为：Qwen/Qwen3-Coder-480B-A35B-Instruct
   # 在提示时输入你的API密钥
   ```
 
