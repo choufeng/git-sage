@@ -18,6 +18,8 @@ class ModelService(str, Enum):
     OLLAMA = 'ollama'
     OPENROUTER = 'openrouter'
     DEEPSEEK = 'deepseek'
+    GEMINI = 'gemini'
+    MODELSCOPE = 'modelscope'
 
 @click.group()
 def cli():
@@ -185,7 +187,9 @@ def set():
         service_map = {
             'Ollama': 'ollama',
             'OpenRouter': 'openrouter',
-            'DeepSeek': 'deepseek'
+            'DeepSeek': 'deepseek',
+            'Gemini': 'gemini',
+            'ModelScope': 'modelscope'
         }
         rev_service_map = {v: k for k, v in service_map.items()}
         

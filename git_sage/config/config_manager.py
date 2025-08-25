@@ -5,15 +5,25 @@ from typing import Dict, Optional
 class ConfigManager:
     DEFAULT_CONFIG = {
         "language": "en",  # Default to English (en/zh-CN/zh-TW)
-        "language_model": "ollama",  # 可选: ollama/openrouter/deepseek
+        "language_model": "ollama",  # 可选: ollama/openrouter/deepseek/gemini/modelscope
         "model": "qwen2.5-coder:7b",
         "api_key": "ollama"
+    }
+    
+    DEFAULT_MODELS = {
+        "ollama": "qwen2.5-coder:7b",
+        "openrouter": "anthropic/claude-3-sonnet",
+        "deepseek": "deepseek-chat",
+        "gemini": "gemini-2.5-flash",
+        "modelscope": "Qwen/Qwen3-Coder-480B-A35B-Instruct"
     }
     
     # 默认端点地址
     OLLAMA_ENDPOINT = "http://localhost:11434"
     OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1"
     DEEPSEEK_ENDPOINT = "https://api.deepseek.com/v1"
+    GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta"
+    MODELSCOPE_ENDPOINT = "https://api-inference.modelscope.cn/v1/chat/completions"
     
     def __init__(self):
         self.config_path = os.path.expanduser("~/.git-sage/config.yml")
@@ -66,16 +76,26 @@ class ConfigManager:
         """Update configuration item"""
         # 如果是更新language_model
         if key == "language_model":
-            # 只有当language_model真的改变时才更新endpoint
+            # 只有当language_model真的改变时才更新endpoint和model
             if value != self.config.get("language_model"):
                 if value == "ollama":
                     self.config["endpoint"] = self.OLLAMA_ENDPOINT
+                    self.config["model"] = self.DEFAULT_MODELS["ollama"]
                 elif value == "openrouter":
                     self.config["endpoint"] = self.OPENROUTER_ENDPOINT
+                    self.config["model"] = self.DEFAULT_MODELS["openrouter"]
                 elif value == "deepseek":
                     self.config["endpoint"] = self.DEEPSEEK_ENDPOINT
+                    self.config["model"] = self.DEFAULT_MODELS["deepseek"]
+                elif value == "gemini":
+                    self.config["endpoint"] = self.GEMINI_ENDPOINT
+                    self.config["model"] = self.DEFAULT_MODELS["gemini"]
+                elif value == "modelscope":
+                    self.config["endpoint"] = self.MODELSCOPE_ENDPOINT
+                    self.config["model"] = self.DEFAULT_MODELS["modelscope"]
                 else:
                     self.config["endpoint"] = ""
+                    self.config["model"] = ""
             # 无论是否更新endpoint，都要更新language_model
             self.config["language_model"] = value
         

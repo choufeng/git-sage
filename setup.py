@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="git-sage",
-    version="0.0.1",
+    version="0.0.2",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
@@ -15,8 +15,12 @@ setup(
         'langchain-ollama>=0.2.0',
         'langchain-core>=0.3.0',
         'langchain-openai>=0.0.5',
+        'langchain-google-genai>=0.1.0',
+        'google-generativeai>=0.3.0',
+        'modelscope>=1.10.0',
         'openai>=1.0.0',
         'ollama>=0.3.0',
+        'dashscope>=1.0.0',
         'inquirer>=3.1.3',
     ],
     entry_points={

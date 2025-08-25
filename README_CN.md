@@ -82,6 +82,32 @@ Git Sage 支持多个 AI 平台来驱动其提交信息生成功能。以下是�
   # 在提示时输入你的API密钥
   ```
 
+### Gemini
+
+- 注册：访问 [Google AI Studio](https://makersuite.google.com/app/apikey)
+- API 密钥：从Google AI Studio账户生成
+- 配置：
+  ```bash
+  gsg set
+  # 将language_model设置为：gemini
+  # 将endpoint设置为：https://generativelanguage.googleapis.com/v1beta
+  # 将model设置为：gemini-2.5-flash
+  # 在提示时输入你的API密钥
+  ```
+
+### ModelScope
+
+- 注册：访问 [阿里云灵积平台](https://dashscope.console.aliyun.com/)
+- API 密钥：从DashScope控制台生成
+- 配置：
+  ```bash
+  gsg set
+  # 将language_model设置为：modelscope
+  # 将endpoint设置为：https://api-inference.modelscope.cn/v1/chat/completions
+  # 将model设置为：Qwen/Qwen3-Coder-480B-A35B-Instruct
+  # 在提示时输入你的API密钥
+  ```
+
 ## 配置
 
 配置 Git Sage 设置：
@@ -181,6 +207,9 @@ gsg c
 - langchain-ollama >= 0.2.0
 - langchain-core >= 0.3.0
 - langchain-openai >= 0.0.5
+- langchain-google-genai >= 0.1.0 (Gemini支持)
+- google-generativeai >= 0.3.0 (Gemini支持)
+- dashscope >= 1.0.0 (ModelScope支持)
 - openai >= 1.0.0
 - ollama >= 0.3.0
 - inquirer >= 3.1.3
