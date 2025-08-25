@@ -84,6 +84,32 @@ Git Sage supports multiple AI platforms to power its commit message generation. 
   # Set your API key when prompted
   ```
 
+### Gemini
+
+- Registration: Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+- API Key: Generate from your Google AI Studio account
+- Configuration:
+  ```bash
+  gsg set
+  # Set language_model to: gemini
+  # Set endpoint to: https://generativelanguage.googleapis.com/v1beta
+  # Set model to: gemini-pro
+  # Set your API key when prompted
+  ```
+
+### ModelScope
+
+- Registration: Visit [Alibaba Cloud DashScope](https://dashscope.console.aliyun.com/)
+- API Key: Generate from your DashScope console
+- Configuration:
+  ```bash
+  gsg set
+  # Set language_model to: modelscope
+  # Set endpoint to: https://api-inference.modelscope.cn/v1/chat/completions
+  # Set model to: qwen/Qwen2.5-Coder-32B-Instruct
+  # Set your API key when prompted
+  ```
+
 ## Configuration
 
 Configure Git Sage settings:
@@ -183,6 +209,9 @@ You can view current configuration using `gsg show config` and modify settings t
 - langchain-ollama >= 0.2.0
 - langchain-core >= 0.3.0
 - langchain-openai >= 0.0.5
+- langchain-google-genai >= 0.1.0 (for Gemini support)
+- google-generativeai >= 0.3.0 (for Gemini support)
+- dashscope >= 1.0.0 (for ModelScope support)
 - openai >= 1.0.0
 - ollama >= 0.3.0
 - inquirer >= 3.1.3

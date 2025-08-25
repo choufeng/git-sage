@@ -5,6 +5,17 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import os
 
+# Import new AI services
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+except ImportError:
+    ChatGoogleGenerativeAI = None
+
+try:
+    from .modelscope_wrapper import ModelScopeInferenceChatModel
+except ImportError:
+    ModelScopeInferenceChatModel = None
+
 class AIProcessor:
     def __init__(self, config_manager):
         self.config_manager = config_manager
@@ -41,6 +52,23 @@ class AIProcessor:
             return ChatOpenAI(
                 model=model_name,
                 openai_api_key=api_key,
+                base_url=endpoint,
+                temperature=0.5
+            )
+        elif language_model == "gemini":
+            if ChatGoogleGenerativeAI is None:
+                raise ValueError("Gemini support requires langchain-google-genai package. Install with: pip install langchain-google-genai")
+            return ChatGoogleGenerativeAI(
+                model=model_name,
+                google_api_key=api_key,
+                temperature=0.5
+            )
+        elif language_model == "modelscope":
+            if ModelScopeInferenceChatModel is None:
+                raise ValueError("ModelScope support is not available. Check modelscope_wrapper.py")
+            return ModelScopeInferenceChatModel(
+                model_name=model_name,
+                api_key=api_key,
                 base_url=endpoint,
                 temperature=0.5
             )

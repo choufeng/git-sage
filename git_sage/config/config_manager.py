@@ -5,7 +5,7 @@ from typing import Dict, Optional
 class ConfigManager:
     DEFAULT_CONFIG = {
         "language": "en",  # Default to English (en/zh-CN/zh-TW)
-        "language_model": "ollama",  # 可选: ollama/openrouter/deepseek
+        "language_model": "ollama",  # 可选: ollama/openrouter/deepseek/gemini/modelscope
         "model": "qwen2.5-coder:7b",
         "api_key": "ollama"
     }
@@ -14,6 +14,8 @@ class ConfigManager:
     OLLAMA_ENDPOINT = "http://localhost:11434"
     OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1"
     DEEPSEEK_ENDPOINT = "https://api.deepseek.com/v1"
+    GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta"
+    MODELSCOPE_ENDPOINT = "https://api-inference.modelscope.cn/v1/chat/completions"
     
     def __init__(self):
         self.config_path = os.path.expanduser("~/.git-sage/config.yml")
@@ -74,6 +76,10 @@ class ConfigManager:
                     self.config["endpoint"] = self.OPENROUTER_ENDPOINT
                 elif value == "deepseek":
                     self.config["endpoint"] = self.DEEPSEEK_ENDPOINT
+                elif value == "gemini":
+                    self.config["endpoint"] = self.GEMINI_ENDPOINT
+                elif value == "modelscope":
+                    self.config["endpoint"] = self.MODELSCOPE_ENDPOINT
                 else:
                     self.config["endpoint"] = ""
             # 无论是否更新endpoint，都要更新language_model
