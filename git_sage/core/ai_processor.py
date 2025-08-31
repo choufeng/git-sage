@@ -286,7 +286,7 @@ Remember: Your ENTIRE response MUST be in {language} language as specified above
         # Get AI response using JSON-specific method
         return self._ensure_json_response(full_prompt)
     
-    def generate_pr_content(self, commits: List[Dict[str, str]], diff_content: str, ticket: str = None) -> Dict[str, str]:
+    def generate_pr_content(self, commits: List[Dict[str, str]], diff_content: str, ticket: str = None, no_verify: bool = False) -> Dict[str, str]:
         """
         Generate PR title and description based on commits and diff content
         
@@ -319,6 +319,17 @@ description: PR_DESCRIPTION
 All text in the response MUST be in the specified language ({language}).
 """
             
+            # Determine QA section content based on no_verify flag
+            qa_instruction = "[QA: None]" if no_verify else """{{Based on code changes, determine:}}
+- If there are UI changes or user-visible functionality changes: [QA: Verify] + provide simple verification steps
+- If no UI changes (backend logic, refactoring, config, etc.): [QA: None]
+
+QA Decision Rules:
+- UI components, pages, styles, user interactions → [QA: Verify]
+- API endpoints affecting frontend → [QA: Verify]  
+- Pure backend logic, database changes, refactoring, config → [QA: None]
+- Tests, docs, build scripts → [QA: None]"""
+            
             prompt = f"""{system_instruction}
 
 You are a professional software developer creating a Pull Request. Please analyze the following information and generate an appropriate PR title and description.
@@ -343,15 +354,7 @@ PR Description Requirements (MUST follow this exact three-section structure):
 - https://compass-tech.atlassian.net/browse/{{TICKET}}
 
 ### QA
-{{Based on code changes, determine:}}
-- If there are UI changes or user-visible functionality changes: [QA: Verify] + provide simple verification steps
-- If no UI changes (backend logic, refactoring, config, etc.): [QA: None]
-
-QA Decision Rules:
-- UI components, pages, styles, user interactions → [QA: Verify]
-- API endpoints affecting frontend → [QA: Verify]  
-- Pure backend logic, database changes, refactoring, config → [QA: None]
-- Tests, docs, build scripts → [QA: None]
+{qa_instruction}
 
 Analysis Steps:
 1. Read branch commit messages to understand development intent
@@ -422,6 +425,7 @@ IMPORTANT: You MUST follow the exact three-section format shown above.
             if not result['description']:
                 # Generate default three-section description
                 ticket_link = f"- https://compass-tech.atlassian.net/browse/{ticket}" if ticket else "- No related ticket"
+                qa_section = "[QA: None]" if no_verify else "[QA: Verify]"
                 result['description'] = f"""### Description
 Update codebase with latest changes.
 - Implement code improvements and modifications
@@ -431,7 +435,7 @@ Update codebase with latest changes.
 {ticket_link}
 
 ### QA
-[QA: None]"""
+{qa_section}"""
             
             return result
             

@@ -314,7 +314,8 @@ def init_prompts():
 
 @cli.command()
 @click.option('--dry-run', '-n', is_flag=True, help='仅显示PR信息，不创建')
-def pr(dry_run):
+@click.option('--no-verify', '-nv', is_flag=True, help='设置QA部分为None')
+def pr(dry_run, no_verify):
     """生成并创建 Pull Request"""
     try:
         # Initialize modules
@@ -350,7 +351,7 @@ def pr(dry_run):
         
         # Generate PR content using AI
         click.echo("正在生成 PR 内容...")
-        pr_content = ai_processor.generate_pr_content(commits, diff_content, ticket)
+        pr_content = ai_processor.generate_pr_content(commits, diff_content, ticket, no_verify)
         
         # Display PR information
         click.echo("\n" + "="*50)
