@@ -270,3 +270,88 @@ class GitOperations:
         except Exception as e:
             print(f"Warning: Failed to get remote URL: {e}")
             return None
+    
+    def edit_pr_content(self, pr_content: Dict[str, str], allow_edit: bool = True) -> Optional[Dict[str, str]]:
+        """
+        Allow user to edit PR content (title and description)
+        :param pr_content: Dictionary with 'title' and 'description' keys
+        :param allow_edit: Whether to allow editing
+        :return: Edited PR content or None if cancelled
+        """
+        try:
+            if not allow_edit:
+                return pr_content
+            
+            # Create temporary file for editing PR content
+            with tempfile.NamedTemporaryFile(mode='w+', suffix='.md', delete=False) as temp_file:
+                # Write PR content in a structured format
+                temp_file.write(f"# PR Title\n{pr_content['title']}\n\n")
+                temp_file.write(f"# PR Description\n{pr_content['description']}\n\n")
+                temp_file.write("\n# 请编辑上面的 PR 标题和描述内容")
+                temp_file.write("\n# 保存并退出编辑器以继续创建 PR")
+                temp_file.write("\n# 标题行应该在 '# PR Title' 下面")
+                temp_file.write("\n# 描述内容应该在 '# PR Description' 下面")
+                temp_file_path = temp_file.name
+
+            try:
+                # Open temporary file with system default editor
+                editor = os.environ.get('EDITOR', 'vim')
+                os.system(f'{editor} {temp_file_path}')
+
+                # Read edited content
+                with open(temp_file_path, 'r', encoding='utf-8') as temp_file:
+                    content = temp_file.read()
+                
+                # Parse the edited content
+                edited_content = self._parse_pr_content(content)
+                
+                if not edited_content['title'].strip():
+                    print("PR 标题为空，操作已取消。")
+                    return None
+                
+                return edited_content
+
+            finally:
+                # Clean up temporary file
+                try:
+                    os.unlink(temp_file_path)
+                except:
+                    pass
+                    
+        except Exception as e:
+            raise Exception(f"Failed to edit PR content: {e}") from e
+    
+    def _parse_pr_content(self, content: str) -> Dict[str, str]:
+        """
+        Parse edited PR content from temporary file
+        :param content: Raw content from temporary file
+        :return: Dictionary with parsed title and description
+        """
+        lines = content.split('\n')
+        result = {'title': '', 'description': ''}
+        
+        current_section = None
+        title_lines = []
+        description_lines = []
+        
+        for line in lines:
+            # Skip comment lines
+            if line.strip().startswith('#'):
+                if 'PR Title' in line:
+                    current_section = 'title'
+                elif 'PR Description' in line:
+                    current_section = 'description'
+                continue
+            
+            # Add content to appropriate section
+            if current_section == 'title' and line.strip():
+                title_lines.append(line.strip())
+                current_section = None  # Only take the first non-empty line after title header
+            elif current_section == 'description':
+                description_lines.append(line)
+        
+        # Join the collected lines
+        result['title'] = ' '.join(title_lines) if title_lines else ''
+        result['description'] = '\n'.join(description_lines).strip()
+        
+        return result
