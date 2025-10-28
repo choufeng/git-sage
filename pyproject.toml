@@ -14,16 +14,21 @@ tag_format = "v{version}"
 [tool.semantic_release.commit_parser_options]
 allowed_tags = [
     "build",
+    "breaking",
     "chore",
-    "ci",
     "docs",
     "feat",
+    "feature",
     "fix",
-    "perf",
-    "refactor",
-    "revert",
-    "style",
-    "test"
+    "maint",
+    "maintenance",
+    "major",
+    "minor",
+    "new",
+    "patch",
+    "test",
+    "update"
 ]
-minor_tags = ["feat"]
-patch_tags = ["fix", "perf"]
+minor_tags = ["feat", "feature", "new", "minor", "update"]
+patch_tags = ["fix", "build", "maint", "maintenance", "test", "patch"]
+major_tags = ["breaking", "major"]
