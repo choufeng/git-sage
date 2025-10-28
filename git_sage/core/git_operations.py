@@ -335,12 +335,15 @@ class GitOperations:
         description_lines = []
         
         for line in lines:
-            # Skip comment lines
-            if line.strip().startswith('#'):
-                if 'PR Title' in line:
-                    current_section = 'title'
-                elif 'PR Description' in line:
-                    current_section = 'description'
+            # Check for section headers
+            if line.strip().startswith('# PR Title'):
+                current_section = 'title'
+                continue
+            elif line.strip().startswith('# PR Description'):
+                current_section = 'description'
+                continue
+            # Skip other single # comment lines (but not ### markdown headers)
+            elif line.strip().startswith('#') and not line.strip().startswith('###'):
                 continue
             
             # Add content to appropriate section
