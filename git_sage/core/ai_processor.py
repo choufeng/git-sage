@@ -225,27 +225,27 @@ Examples:
 - Bad: "This update improves performance"
 - Good: "Improve database query performance"
 
-Commit Tags Explanation:
+Commit Tags Explanation (Following Compass Conventional Commit Standards):
 
 Patch Version (PATCH) Tags:
 - fix: For bug fixes
-- build: For build process changes only
-- maint: For small maintenance tasks like technical debt cleanup, refactoring, and non-breaking dependency updates
-- test: For application end-to-end tests
-- patch: Generic patch tag when other patch tags don't apply
+- build: Changes to build process only
+- maint/maintenance: For small maintenance tasks such as tech-debt cleanup, refactoring, build-process changes, and non-breaking dependency updates (bug fixes, security fixes, etc.)
+- test: Used for application e2e tests, which will build a new patch version to be deployed and run against e2e gates in pipelines
+- patch: Generic tag to denote a patch change when other tags are not applicable
 
 Minor Version (MINOR) Tags:
-- feat: For implementing new features
-- minor: Generic minor tag when other minor tags don't apply
-- update: For backward-compatible enhancements to existing features
+- feat/feature/new: Implemented a new feature
+- minor: Generic tag to denote a minor change when other tags are not applicable
+- update: A backwards-compatible enhancement to an existing feature
 
 Major Version (MAJOR) Tags:
-- breaking: For backward-incompatible enhancements or features
-- major: Generic major tag when other major tags don't apply
+- breaking: For a backwards-incompatible enhancement or feature
+- major: Generic tag to denote a major change when other tags are not applicable
 
 No Version Update (NO-OP) Tags:
-- docs: For documentation changes only
-- chore: For other changes that don't affect the actual environment (code comments, non-package files, unit tests)
+- docs: Changes to documentation only
+- chore: For any other changes that are not files that could affect a real environment, such as code comments, changes to files that are not in a package or app, unit tests, etc. Note: do not use Chore when updating e2e tests for applications, use Test instead
 
 The diff content is:
 
@@ -336,7 +336,7 @@ You are a professional software developer creating a Pull Request. Please analyz
 
 IMPORTANT: Follow these strict formatting rules for the PR title:
 - Format: {{TYPE}}:[{{TICKET}}] {{DESCRIPTION}}
-- TYPE should be one of: Feat, Fix, Update, Breaking, Docs, Chore, Test, Build, Refactor
+- TYPE should be one of: Fix, Build, Maint, Maintenance, Test, Patch, Feat, Feature, New, Minor, Update, Breaking, Major, Docs, Chore
 - TICKET: Use the provided ticket number if available
 - DESCRIPTION: Brief, clear description of the change
 
@@ -447,25 +447,37 @@ Update codebase with latest changes.
         if not commits and not diff_content:
             return "Chore"
         
-        # Check commit messages for common patterns
+        # Check commit messages for common patterns (following Compass standards)
         if commits:
             commit_text = ' '.join([commit['message'].lower() for commit in commits])
-            if 'feat' in commit_text or 'feature' in commit_text or 'add' in commit_text:
+            # Check for major changes first
+            if 'breaking' in commit_text:
+                return "Breaking"
+            elif 'major' in commit_text:
+                return "Major"
+            # Check for minor changes
+            elif 'feat' in commit_text or 'feature' in commit_text or 'new' in commit_text:
                 return "Feat"
+            elif 'update' in commit_text and 'enhance' in commit_text:
+                return "Update"
+            elif 'minor' in commit_text:
+                return "Minor"
+            # Check for patch changes
             elif 'fix' in commit_text or 'bug' in commit_text:
                 return "Fix"
-            elif 'update' in commit_text or 'improve' in commit_text:
-                return "Update"
-            elif 'break' in commit_text or 'breaking' in commit_text:
-                return "Breaking"
+            elif 'build' in commit_text:
+                return "Build"
+            elif 'maint' in commit_text or 'maintenance' in commit_text or 'refactor' in commit_text:
+                return "Maint"
+            elif 'test' in commit_text and 'e2e' in commit_text:
+                return "Test"
+            elif 'patch' in commit_text:
+                return "Patch"
+            # Check for no-op changes
             elif 'doc' in commit_text or 'readme' in commit_text:
                 return "Docs"
-            elif 'test' in commit_text:
-                return "Test"
-            elif 'build' in commit_text or 'config' in commit_text:
-                return "Build"
-            elif 'refactor' in commit_text:
-                return "Refactor"
+            elif 'chore' in commit_text:
+                return "Chore"
         
         # Default to Update if can't determine
         return "Update"

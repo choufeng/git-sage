@@ -2,6 +2,7 @@ import click
 import inquirer
 import subprocess
 from enum import Enum
+from typing import Dict
 from git_sage.config.config_manager import ConfigManager
 from git_sage.core.git_operations import GitOperations
 from git_sage.core.ai_processor import AIProcessor
@@ -315,7 +316,8 @@ def init_prompts():
 @cli.command()
 @click.option('--dry-run', '-n', is_flag=True, help='仅显示PR信息，不创建')
 @click.option('--no-verify', '-nv', is_flag=True, help='设置QA部分为None')
-def pr(dry_run, no_verify):
+@click.option('--no-edit', is_flag=True, help='跳过编辑步骤，直接使用AI生成的内容')
+def pr(dry_run, no_verify, no_edit):
     """生成并创建 Pull Request"""
     try:
         # Initialize modules
@@ -353,9 +355,19 @@ def pr(dry_run, no_verify):
         click.echo("正在生成 PR 内容...")
         pr_content = ai_processor.generate_pr_content(commits, diff_content, ticket, no_verify)
         
+        # Allow user to edit PR content (unless --no-edit flag is used)
+        if not no_edit and not dry_run:
+            click.echo("\n允许编辑 PR 内容...")
+            edited_content = git_ops.edit_pr_content(pr_content, allow_edit=True)
+            if edited_content is None:
+                click.echo("PR 创建已取消")
+                return
+            pr_content = edited_content
+            click.echo("PR 内容编辑完成")
+        
         # Display PR information
         click.echo("\n" + "="*50)
-        click.echo("生成的 PR 信息：")
+        click.echo("生成的 PR 信息：" if no_edit else "编辑后的 PR 信息：")
         click.echo("="*50)
         click.echo(f"标题: {pr_content['title']}")
         click.echo(f"\n描述:\n{pr_content['description']}")
