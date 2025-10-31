@@ -284,13 +284,9 @@ class GitOperations:
             
             # Create temporary file for editing PR content
             with tempfile.NamedTemporaryFile(mode='w+', suffix='.md', delete=False) as temp_file:
-                # Write PR content in a structured format
+                # Write PR content in a structured format with minimal comments
                 temp_file.write(f"# PR Title\n{pr_content['title']}\n\n")
-                temp_file.write(f"# PR Description\n{pr_content['description']}\n\n")
-                temp_file.write("\n# 请编辑上面的 PR 标题和描述内容")
-                temp_file.write("\n# 保存并退出编辑器以继续创建 PR")
-                temp_file.write("\n# 标题行应该在 '# PR Title' 下面")
-                temp_file.write("\n# 描述内容应该在 '# PR Description' 下面")
+                temp_file.write(f"# PR Description\n{pr_content['description']}\n")
                 temp_file_path = temp_file.name
 
             try:
@@ -335,18 +331,15 @@ class GitOperations:
         description_lines = []
         
         for line in lines:
-            # Check for section headers
-            if line.strip().startswith('# PR Title'):
+            # Check for our specific section headers only
+            if line.strip() == '# PR Title':
                 current_section = 'title'
                 continue
-            elif line.strip().startswith('# PR Description'):
+            elif line.strip() == '# PR Description':
                 current_section = 'description'
                 continue
-            # Skip other single # comment lines (but not ### markdown headers)
-            elif line.strip().startswith('#') and not line.strip().startswith('###'):
-                continue
             
-            # Add content to appropriate section
+            # Add content to appropriate section (preserve all other content including ### headers)
             if current_section == 'title' and line.strip():
                 title_lines.append(line.strip())
                 current_section = None  # Only take the first non-empty line after title header

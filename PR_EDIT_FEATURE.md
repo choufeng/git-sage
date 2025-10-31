@@ -37,26 +37,30 @@ gsg pr
 4. 保存退出后继续创建流程
 
 ### 编辑器格式说明
-编辑器会显示如下格式：
+编辑器会显示如下简洁格式：
 ```markdown
 # PR Title
 这里是AI生成的PR标题
 
 # PR Description
+### Description
 这里是AI生成的PR描述内容
+- 包含各种技术细节
 
-# 请编辑上面的 PR 标题和描述内容
-# 保存并退出编辑器以继续创建 PR
-# 标题行应该在 '# PR Title' 下面
-# 描述内容应该在 '# PR Description' 下面
+### Related issues or context
+- 相关链接和上下文
+
+### QA
+[QA: None/Verify] - QA说明
 ```
 
 ### 编辑规则
 - 在 `# PR Title` 下面编辑标题（只取第一行非空内容）
 - 在 `# PR Description` 下面编辑描述内容
-- 以单个 `#` 开头的行会被当作注释忽略
-- 以 `###` 开头的 markdown 标题会被保留（如 `### Description`、`### QA` 等）
+- **只有** `# PR Title` 和 `# PR Description` 会被识别为特殊标记
+- **所有其他内容都会被保留**，包括 `### Description`、`### QA`、`#` 注释等
 - 如果标题为空，操作会被取消
+- **建议**：删除不需要的注释行以保持PR清洁
 
 ### 快速创建（跳过编辑）
 ```bash
